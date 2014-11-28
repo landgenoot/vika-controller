@@ -122,32 +122,8 @@ void drawSkeleton(int userId)
 
 void onNewUser(SimpleOpenNI curContext, int userId)
 {
-  println("onNewUser - userId: " + userId);
-  println("\tstart tracking skeleton");
-  
   curContext.startTrackingSkeleton(userId);
 }
-
-void onLostUser(SimpleOpenNI curContext, int userId)
-{
-  println("onLostUser - userId: " + userId);
-}
-
-void onVisibleUser(SimpleOpenNI curContext, int userId)
-{
-  //println("onVisibleUser - userId: " + userId);
-}
-
-
-void keyPressed()
-{
-  switch(key)
-  {
-  case ' ':
-    context.setMirror(!context.mirror());
-    break;
-  }
-}  
 
 /**
  * Returns the id of the person which' head is detected at the highest y-coordinate.
@@ -157,7 +133,7 @@ int getSmallestUser()
 {
   int[] userList = context.getUsers();
   int max = 0;
-  int smallestUser = 0;
+  int smallestUser = -1;
   for (int i = 0; i<userList.length; i++)
   {
     if (context.isTrackingSkeleton(userList[i]))
@@ -165,27 +141,19 @@ int getSmallestUser()
       PVector jointPos = new PVector();
       context.getJointPositionSkeleton(i,SimpleOpenNI.SKEL_HEAD,jointPos);
       if (jointPos.y > max) {
-        max = jointPos.y;
+        max = (int)jointPos.y;
         smallestUser = i;
       }
     }      
   }    
+  return smallestUser;
 }  
 
+/**
+ * Implements the logic based on the skeletons.
+ */
 void logic()
 {
-  
   int smallestUser = getSmallestUser();
-  PVector jointPos = new PVector();
-  context.getJointPositionSkeleton(0,SimpleOpenNI.SKEL_HEAD,jointPos);
-  println(jointPos.x);
-  println(jointPos.y);
-  println(jointPos.z);
-//  for(int i=0;i<userList.length;i++)
-//  {
-//    if(context.isTrackingSkeleton(userList[i]))
-//    {
-//      
-//    }      
-//  }    
+  
 }
