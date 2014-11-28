@@ -149,10 +149,29 @@ void keyPressed()
   }
 }  
 
+/**
+ * Returns the id of the person which' head is detected at the highest y-coordinate.
+ * @return int id
+ */
 int getSmallestUser()
 {
-  
+  int[] userList = context.getUsers();
+  int max = 0;
+  int smallestUser = 0;
+  for (int i = 0; i<userList.length; i++)
+  {
+    if (context.isTrackingSkeleton(userList[i]))
+    {
+      PVector jointPos = new PVector();
+      context.getJointPositionSkeleton(i,SimpleOpenNI.SKEL_HEAD,jointPos);
+      if (jointPos.y > max) {
+        max = jointPos.y;
+        smallestUser = i;
+      }
+    }      
+  }    
 }  
+
 void logic()
 {
   
