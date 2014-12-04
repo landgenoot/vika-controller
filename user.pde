@@ -25,6 +25,7 @@ int gestureTimestamp = 0;
 
 PVector leftHand[] = new PVector[100];
 PVector rightHand[] = new PVector[100];
+PVector head[] = new PVector[100];
 
 void setup()
 {
@@ -100,9 +101,11 @@ void drawSkeleton(int userId)
 {
   leftHand[userId] = new PVector();
   rightHand[userId] = new PVector();
+  head[userId] = new PVector();
   
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_HAND,leftHand[userId]);
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_HAND,rightHand[userId]);
+  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_HEAD,head[userId]);
   
   context.drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
 
@@ -162,9 +165,12 @@ int getSmallestUser()
  */
 int userLength(int userId)
 {
-  PVector jointPos = new PVector();
-  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_HEAD,jointPos);
-  int smallestUserLength = 480 - (int)jointPos.y;
+  int smallestUserLength =-1;
+  try {
+    smallestUserLength = (int)head[userId+1].y;
+  } catch(Exception e) {
+    return -1;
+  }
   return smallestUserLength;
 }
 
@@ -178,7 +184,11 @@ int userWidth(int userId)
     return 0;
   PVector leftHandUser = leftHand[userId+1];
   PVector rightHandUser = rightHand[userId+1];
-  return (int)abs(leftHandUser.x - rightHandUser.x);
+  try {
+    return (int)abs(leftHandUser.x - rightHandUser.x);
+  } catch (Exception e) {
+    return 0;
+  }
   
 }
 
@@ -190,9 +200,11 @@ void logic()
   int smallestUser = getSmallestUser();
   int smallestUserLength = userLength(smallestUser);
   int smallestUserWidth = userWidth(smallestUser);
+  int[] motors = new int[10];
   if (smallestUser != -1){
-    int[] motors = determineMotors(smallestUserLength, smallestUserWidth);
+    motors = determineMotors(smallestUserLength, smallestUserWidth);
   }
+  controlMotors(motors);
 }
 
 /**
@@ -203,60 +215,83 @@ void logic()
 int[] determineMotors(int length, int width)
 {
   
-  ArrayList<Integer> motors = new ArrayList();
-      
-      
-  if (length < 250) {
-    motors.add(1);
+  width = 0;
+  println(length);
+  int[] motors = new int[10]; 
+  if (length > 600) {
+    motors[1] = 1;
     if (width < 300) {
-      secondary = {};
+      // Nothing to add
     } else if (width < 500) {
-      motors.add(3);
-      motors.add(4);
-      motors.add(5);
-      motors.add(7);
+      motors[3] = 1;
+      motors[4] = 1;
+      motors[5] = 1;
+      motors[7] = 1;
     } else {
-      motors.add(3);
-      motors.add(4);
-      motors.add(6);
-      motors.add(7);
-      motors.add(9);
+      motors[3] = 1;
+      motors[4] = 1;
+      motors[6] = 1;
+      motors[7] = 1;
+      motors[9] = 1;
     }
-  } else if (length < 360) {
-    primary = {1, 5, 6, 7};
+  } else if (length > 400) {
+    motors[1] = 1;
+    motors[5] = 1;
+    motors[6] = 1;
+    motors[7] = 1;
     if (width < 300) {
-      secondary = {};
+      // Nothing to add
     } else if (width < 500) {
-      secondary = {3, 4};
+      motors[3] = 1;
+      motors[4] = 1;
     } else {
-      secondary = {3, 4, 9};
+      motors[3] = 1;
+      motors[4] = 1;
+      motors[9] = 1;
     }
-  } else if (length < 560) {
-    primary = {1, 2, 5, 3, 4, 6, 7, 9};
+  } else if (length > 250) {
+    motors[1] = 1;
+    motors[2] = 1;
+    motors[5] = 1;
+    motors[3] = 1;
+    motors[4] = 1;
+    motors[6] = 1;
+    motors[7] = 1;
+    motors[9] = 1;
     if (width < 300) {
-      secondary = {};
+      // Nothing to add
     } else if (width < 500) {
-      secondary = {3, 4};
+      motors[3] = 1;
+      motors[4] = 1;
     } else {
-      secondary = {3, 4, 9};
+      motors[3] = 1;
+      motors[4] = 1;
+      motors[9] = 1;
     }
   } else {
-    secondary = {};
-    primary = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    motors[1] = 1;
+    motors[2] = 1;
+    motors[3] = 1;
+    motors[4] = 1;
+    motors[5] = 1;
+    motors[6] = 1;
+    motors[7] = 1;
+    motors[8] = 1;
+    motors[9] = 1;
   }
-  
-  return concat(primary, secondary);
+  return motors;
 }
 
-/**
- * Determines the size between two hands, and controlls motors based on the gesture.
- * @param int smallest user in view
- * @return int[] motors which must be turned on
- */
-//int[] motorsOnGesture(int smallestUser)
-//{
-//  
-//}
+void controlMotors(int[] motors)
+{
+  for (int i = 1; i <= 9; i++) {
+    if (motors[i] == 1) {
+      sendToModule(i, 55);
+    } else {
+      sendToModule(i, 0);
+    }
+  }  
+}
 
 /**
  * Send value to node via serial connection
@@ -267,6 +302,6 @@ void sendToModule(int id, int value)
 {
    serial.write((byte)77);
    serial.write((byte)id);
-   serial.write((byte)55);
+   serial.write((byte)value);
    serial.write((byte)70);
 }
