@@ -26,6 +26,7 @@ int gestureTimestamp = 0;
 PVector leftHand[] = new PVector[100];
 PVector rightHand[] = new PVector[100];
 PVector head[] = new PVector[100];
+int stopcount[] = new int[100];
 
 void setup()
 {
@@ -99,13 +100,31 @@ void draw()
 // draw the skeleton with the selected joints
 void drawSkeleton(int userId)
 {
+  
+  float oldLeftHand = 0;
+  try {
+    oldLeftHand = leftHand[userId].x;
+  } catch (Exception e) {}
+    
   leftHand[userId] = new PVector();
   rightHand[userId] = new PVector();
   head[userId] = new PVector();
   
+  
+  
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_HAND,leftHand[userId]);
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_HAND,rightHand[userId]);
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_HEAD,head[userId]);
+  
+  if (oldLeftHand == leftHand[userId].x) {
+    stopcount[userId]++;
+  } else {
+    stopcount[userId] = 0;
+  }
+  
+  
+  
+  
   
   context.drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
 
@@ -144,19 +163,26 @@ void onNewUser(SimpleOpenNI curContext, int userId)
 int getSmallestUser()
 {
   int[] userList = context.getUsers();
+  println();
+  println("==");
+  for (int i =0; i < userList.length; i++) {
+    println(i);
+  }
+  println("==");
+  println();
   int min = 9999;
   int smallestUser = -1;
   for (int i = 0; i<userList.length; i++)
   {
-    if (context.isTrackingSkeleton(userList[i]))
+    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4)
     {
-      if (userLength(i) < min) {
-        min = userLength(i);
+      if (userLength(userList[i]) < min) {
+        min = userLength(userList[i]);
         smallestUser = i;
       }
     }      
   }    
-  return smallestUser;
+  return smallestUser == -1 ? -1 : userList[smallestUser];
 }  
 
 /**
@@ -167,7 +193,7 @@ int userLength(int userId)
 {
   int smallestUserLength =-1;
   try {
-    smallestUserLength = (int)head[userId+1].y;
+    smallestUserLength = (int)head[userId].y;
   } catch(Exception e) {
     return -1;
   }
@@ -182,8 +208,8 @@ int userWidth(int userId)
 {
   if (userId == -1)
     return 0;
-  PVector leftHandUser = leftHand[userId+1];
-  PVector rightHandUser = rightHand[userId+1];
+  PVector leftHandUser = leftHand[userId];
+  PVector rightHandUser = rightHand[userId];
   try {
     return (int)abs(leftHandUser.x - rightHandUser.x);
   } catch (Exception e) {
@@ -214,25 +240,24 @@ void logic()
  */
 int[] determineMotors(int length, int width)
 {
-  
-  width = 0;
-  println(length);
+  println("length: "+ length);
   int[] motors = new int[10]; 
   if (length > 600) {
     motors[1] = 1;
-    if (width < 300) {
+    if (width < 700) {
       // Nothing to add
-    } else if (width < 500) {
-      motors[3] = 1;
-      motors[4] = 1;
+    } else if (width < 1200) {
       motors[5] = 1;
-      motors[7] = 1;
-    } else {
-      motors[3] = 1;
-      motors[4] = 1;
       motors[6] = 1;
       motors[7] = 1;
-      motors[9] = 1;
+    } else {
+      motors[5] = 1;
+      motors[6] = 1;
+      motors[7] = 1;
+      motors[3] = 1;
+      motors[4] = 1;
+      motors[2] = 1;
+      motors[8] = 1;
     }
   } else if (length > 400) {
     motors[1] = 1;
