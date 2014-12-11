@@ -22,6 +22,7 @@ PVector com2d = new PVector();
 Serial serial;
 int defaultSpeed = 55;
 int gestureTimestamp = 0;
+boolean halt = false;
 
 PVector leftHand[] = new PVector[100];
 PVector rightHand[] = new PVector[100];
@@ -172,15 +173,21 @@ int getSmallestUser()
   println();
   int min = 9999;
   int smallestUser = -1;
+  
+  PVector headUser = null;
   for (int i = 0; i<userList.length; i++)
   {
-    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4)
+    
+  headUser = head[userList[i]];
+  try {
+    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4 )
     {
       if (userLength(userList[i]) < min) {
         min = userLength(userList[i]);
         smallestUser = i;
       }
-    }      
+    }  
+  } catch (Exception e) {}    
   }    
   return smallestUser == -1 ? -1 : userList[smallestUser];
 }  
@@ -210,6 +217,8 @@ int userWidth(int userId)
     return 0;
   PVector leftHandUser = leftHand[userId];
   PVector rightHandUser = rightHand[userId];
+  PVector headUser = head[userId];
+  println(headUser.y);
   try {
     return (int)abs(leftHandUser.x - rightHandUser.x);
   } catch (Exception e) {
@@ -227,7 +236,7 @@ void logic()
   int smallestUserLength = userLength(smallestUser);
   int smallestUserWidth = userWidth(smallestUser);
   int[] motors = new int[10];
-  if (smallestUser != -1){
+  if (smallestUser != -1 && halt == false){
     motors = determineMotors(smallestUserLength, smallestUserWidth);
   }
   controlMotors(motors);
@@ -242,7 +251,7 @@ int[] determineMotors(int length, int width)
 {
   println("length: "+ length);
   int[] motors = new int[10]; 
-  if (length > 600) {
+  if (length > 570) {
     motors[1] = 1;
     if (width < 700) {
       // Nothing to add
@@ -294,15 +303,17 @@ int[] determineMotors(int length, int width)
       motors[9] = 1;
     }
   } else {
-    motors[1] = 1;
-    motors[2] = 1;
-    motors[3] = 1;
-    motors[4] = 1;
-    motors[5] = 1;
-    motors[6] = 1;
-    motors[7] = 1;
-    motors[8] = 1;
-    motors[9] = 1;
+    if (width < 700) {
+      motors[1] = 1;
+      motors[2] = 1;
+      motors[3] = 1;
+      motors[4] = 1;
+      motors[5] = 1;
+      motors[6] = 1;
+      motors[7] = 1;
+      motors[8] = 1;
+      motors[9] = 1;
+    }
   }
   return motors;
 }
@@ -311,7 +322,12 @@ void controlMotors(int[] motors)
 {
   for (int i = 1; i <= 9; i++) {
     if (motors[i] == 1) {
-      sendToModule(i, 55);
+      if (i == 1) {
+        sendToModule(i, 25);
+        
+      } else {
+        sendToModule(i, 55);
+      }
     } else {
       sendToModule(i, 0);
     }
@@ -329,4 +345,12 @@ void sendToModule(int id, int value)
    serial.write((byte)id);
    serial.write((byte)value);
    serial.write((byte)70);
+}
+
+void keyPressed() 
+{
+  if(key == ' ')
+  {
+    halt = halt ? false : true;
+  }
 }
