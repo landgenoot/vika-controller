@@ -20,14 +20,22 @@ color[]       userClr = new color[]{ color(0,255,0),
 PVector com = new PVector();                                   
 PVector com2d = new PVector();   
 Serial serial;
-int defaultSpeed = 55;
+int[] customSpeeds = new int[10];
 int gestureTimestamp = 0;
 boolean halt = false;
 
+// All location data of all users is stored here
 PVector leftHand[] = new PVector[100];
+PVector leftShoulder[] = new PVector[100];
 PVector rightHand[] = new PVector[100];
+PVector rightShoulder[] = new PVector[100];
 PVector head[] = new PVector[100];
 int stopcount[] = new int[100];
+
+// Settings
+customSpeeds[1] = 25;
+int defaultSpeed = 55;
+
 
 void setup()
 {
@@ -108,13 +116,15 @@ void drawSkeleton(int userId)
   } catch (Exception e) {}
     
   leftHand[userId] = new PVector();
+  leftShoulder[userId] = new PVector();
   rightHand[userId] = new PVector();
+  rightShoulder[userId] = new PVector();
   head[userId] = new PVector();
   
-  
-  
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_HAND,leftHand[userId]);
+  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_SHOULDER,leftShoulder[userId]);
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_HAND,rightHand[userId]);
+  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_SHOULDER,rightShoulder[userId]);
   context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_HEAD,head[userId]);
   
   if (oldLeftHand == leftHand[userId].x) {
@@ -122,10 +132,6 @@ void drawSkeleton(int userId)
   } else {
     stopcount[userId] = 0;
   }
-  
-  
-  
-  
   
   context.drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
 
@@ -158,49 +164,15 @@ void onNewUser(SimpleOpenNI curContext, int userId)
 }
 
 /**
- * Returns the id of the person which' head is detected at the highest y-coordinate.
- * @return int id
- */
-int getSmallestUser()
-{
-  int[] userList = context.getUsers();
-  println();
-  println("==");
-  for (int i =0; i < userList.length; i++) {
-    println(i);
-  }
-  println("==");
-  println();
-  int min = 9999;
-  int smallestUser = -1;
-  
-  PVector headUser = null;
-  for (int i = 0; i<userList.length; i++)
-  {
-    
-  headUser = head[userList[i]];
-  try {
-    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4 )
-    {
-      if (userLength(userList[i]) < min) {
-        min = userLength(userList[i]);
-        smallestUser = i;
-      }
-    }  
-  } catch (Exception e) {}    
-  }    
-  return smallestUser == -1 ? -1 : userList[smallestUser];
-}  
-
-/**
  * Returns relative length of user, based on 
  * @return int size
  */
-int userLength(int userId)
+int height(int userId)
 {
   int smallestUserLength =-1;
+  PVector headUser = head[userId];
   try {
-    smallestUserLength = (int)head[userId].y;
+    smallestUserLength = (int)headUser.y;
   } catch(Exception e) {
     return -1;
   }
@@ -208,38 +180,99 @@ int userLength(int userId)
 }
 
 /**
- * Return distance between hands
- * @return int length
+ * Returns the segement the user is in
+ * @param int userId
  */
-int userWidth(int userId)
+int segment(int userId)
 {
-  if (userId == -1)
-    return 0;
-  PVector leftHandUser = leftHand[userId];
-  PVector rightHandUser = rightHand[userId];
-  PVector headUser = head[userId];
-  println(headUser.y);
-  try {
-    return (int)abs(leftHandUser.x - rightHandUser.x);
-  } catch (Exception e) {
-    return 0;
+  if (userId == -1) {
+    return -1;
   }
-  
+  PVector headUser = head[userId];
+  int segment = -1;
+  if (headUser.x < -450) {
+    segment = 1;
+  } else if (headUser.x < 450) {
+    segment = 2;
+  } else {
+    segment = 3;
+  }
+  println("segment: "+segment);
+  return segment;
+}
+
+/**
+ * Determines the distance between the shoulder and the hand on the x-axis.
+ * @param int userId
+ */
+int leftHandRaise(int userId) 
+{
+  if (userId == -1) {
+    return -1;
+  }
+  int value = -1;
+  PVector leftHandUser      = leftHand[userId];
+  PVector leftShoulderUser  = leftShoulder[userId];
+ 
+  if (leftHandUser.y > leftShoulderUser.y) {
+    value = 500;
+  } else {
+    value = abs((int)leftHandUser.x - (int)leftShoulderUser.x);
+  }
+  println("leftArmRaise: "+value);
+  return value;
+}
+
+
+/**
+ * Determines the distance between the shoulder and the hand on the x-axis.
+ * @param int userId
+ */
+int rightHandRaise(int userId) 
+{
+  if (userId == -1) {
+    return -1;
+  }
+  int value = -1;
+  PVector rightHandUser      = rightHand[userId];
+  PVector rightShoulderUser  = rightShoulder[userId];
+ 
+  if (rightHandUser.y > rightShoulderUser.y) {
+    value = 500;
+  } else {
+    value = abs((int)rightHandUser.x - (int)rightShoulderUser.x);
+  }
+  println("rightArmRaise: "+value);
+  return value;
 }
 
 /**
  * Implements the logic based on the skeletons.
  */
 void logic()
-{
-  int smallestUser = getSmallestUser();
-  int smallestUserLength = userLength(smallestUser);
-  int smallestUserWidth = userWidth(smallestUser);
-  int[] motors = new int[10];
-  if (smallestUser != -1 && halt == false){
-    motors = determineMotors(smallestUserLength, smallestUserWidth);
+{ 
+  int[] motors = {};
+  int[] userList = context.getUsers();
+  for (int i = 0; i < userList.length; i++) {
+    motors = concat(motors, determineMotorsForUser(userList[i]));
   }
   controlMotors(motors);
+}
+
+/**
+ * Determines which motors to drive for a certain user.
+ * @param int userId
+ * @return int[] motors which must be turned on
+ */
+int[] determineMotorsForUser(int userId) {
+  // Get skeleton parts
+  int leftHandRaise = leftHandRaise(userId);
+  int rightHandRaise = rightHandRaise(userId);
+  int height = height(userId);
+  int segment = segment(userId);
+  if (segment == 1) {
+     
+  }
 }
 
 /**
@@ -318,16 +351,21 @@ int[] determineMotors(int length, int width)
   return motors;
 }
 
+/**
+ * Reads an array containing the id's of the motors which need to be turned on.
+ * @param int[] motors
+ */
 void controlMotors(int[] motors)
 {
-  for (int i = 1; i <= 9; i++) {
-    if (motors[i] == 1) {
-      if (i == 1) {
-        sendToModule(i, 25);
-        
-      } else {
-        sendToModule(i, 55);
-      }
+  int[] motorState = new int[10];
+  
+  for (int i = 0; i < motors.length; i++) {
+    motorState[motors[i]] = 1;
+  }  
+  
+  for (int i = 1; i < motorState.length; i++) {
+    if (motorState[i] == 1) {
+      sendToModule(i, customSpeeds[i] != 0 ? customSpeeds[i] : defaultspeed);
     } else {
       sendToModule(i, 0);
     }
