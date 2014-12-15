@@ -20,7 +20,7 @@ color[]       userClr = new color[]{ color(0,255,0),
 PVector com = new PVector();                                   
 PVector com2d = new PVector();   
 Serial serial;
-int[] customSpeeds = new int[10];
+int customSpeeds[] = new int[10];
 int gestureTimestamp = 0;
 boolean halt = false;
 
@@ -32,13 +32,14 @@ PVector rightShoulder[] = new PVector[100];
 PVector head[] = new PVector[100];
 int stopcount[] = new int[100];
 
-// Settings
-customSpeeds[1] = 25;
-int defaultSpeed = 55;
 
+  int defaultSpeed = 55;
 
 void setup()
 {
+  // Settings
+  customSpeeds[1] = 25;
+  
   size(640,480);
   String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
   serial = new Serial(this, portName, 9600);
@@ -190,14 +191,18 @@ int segment(int userId)
   }
   PVector headUser = head[userId];
   int segment = -1;
-  if (headUser.x < -450) {
-    segment = 1;
-  } else if (headUser.x < 450) {
-    segment = 2;
-  } else {
-    segment = 3;
+    try {
+    if (headUser.x < -450) {
+      segment = 1;
+    } else if (headUser.x < 450) {
+      segment = 2;
+    } else {
+      segment = 3;
+    }
+    println("segment: "+segment);
+  } catch (Exception e) {
+    segment = 0;
   }
-  println("segment: "+segment);
   return segment;
 }
 
@@ -213,13 +218,16 @@ int leftHandRaise(int userId)
   int value = -1;
   PVector leftHandUser      = leftHand[userId];
   PVector leftShoulderUser  = leftShoulder[userId];
- 
-  if (leftHandUser.y > leftShoulderUser.y) {
-    value = 500;
-  } else {
-    value = abs((int)leftHandUser.x - (int)leftShoulderUser.x);
+  try {
+    if (leftHandUser.y > leftShoulderUser.y) {
+      value = 500;
+    } else {
+      value = abs((int)leftHandUser.x - (int)leftShoulderUser.x);
+    }
+    println("leftArmRaise: "+value);
+  } catch (Exception e) {
+    value = 0;
   }
-  println("leftArmRaise: "+value);
   return value;
 }
 
@@ -236,13 +244,16 @@ int rightHandRaise(int userId)
   int value = -1;
   PVector rightHandUser      = rightHand[userId];
   PVector rightShoulderUser  = rightShoulder[userId];
- 
-  if (rightHandUser.y > rightShoulderUser.y) {
-    value = 500;
-  } else {
-    value = abs((int)rightHandUser.x - (int)rightShoulderUser.x);
+  try {
+    if (rightHandUser.y > rightShoulderUser.y) {
+      value = 500;
+    } else {
+      value = abs((int)rightHandUser.x - (int)rightShoulderUser.x);
+    }
+    println("rightArmRaise: "+value);
+  } catch (Exception e) {
+    value = 0;
   }
-  println("rightArmRaise: "+value);
   return value;
 }
 
@@ -270,10 +281,145 @@ int[] determineMotorsForUser(int userId) {
   int rightHandRaise = rightHandRaise(userId);
   int height = height(userId);
   int segment = segment(userId);
+  int[] motors = {};
+  int length1 = 300;
+  int length2 = 500;
+  int length3 = 600;
+  int raise1 = 200;
+  int raise2 = 400;
+  
+  
   if (segment == 1) {
-     
-  }
-}
+    if (height < length1) {
+      int[] part = {4, 7};
+      motors = concat(motors, part);
+    } else if (height < length2) {
+      int[] part = {4, 7};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {1, 5, 6};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise2) {
+        int[] part1 = {1, 5, 6, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      }
+    } else if (height < length3) {
+      int[] part = {7};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {1, 5, 6};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise2) {
+        int[] part1 = {1, 5, 6, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      }
+    } else {
+      int[] part = {7};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {1, 5, 6};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise2) {
+        int[] part1 = {1, 5, 6, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      }
+    }
+  } else if (segment == 2) {
+    if (height < length1) {
+      int[] part = {1, 5, 2, 8};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {6, 3};
+        motors = concat(motors, part1);
+      } 
+      if (rightHandRaise > raise1) {
+        int[] part1 = {4, 7};
+        motors = concat(motors, part1);
+      }
+    } else if (height < length2) {
+      int[] part = {1, 5, 2};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {6, 3};
+        motors = concat(motors, part1);
+      } 
+      if (rightHandRaise > raise1) {
+        int[] part1 = {4, 7};
+        motors = concat(motors, part1);
+      }
+      if (rightHandRaise > raise1 && leftHandRaise > raise1) {
+        int[] part1 = {8};
+        motors = concat(motors, part1);
+      }
+    } else if (height < length3) {
+      int[] part = {1, 5};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {6, 3};
+        motors = concat(motors, part1);
+      } 
+      if (rightHandRaise > raise1) {
+        int[] part1 = {4, 7};
+        motors = concat(motors, part1);
+      }
+      if (rightHandRaise > raise1 && leftHandRaise > raise1) {
+        int[] part1 = {2, 8};
+        motors = concat(motors, part1);
+      }
+    } else {
+      int[] part = {1};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {6, 3};
+        motors = concat(motors, part1);
+      } 
+      if (rightHandRaise > raise1) {
+        int[] part1 = {4, 7};
+        motors = concat(motors, part1);
+      }
+      if (rightHandRaise > raise1 && leftHandRaise > raise1) {
+        int[] part1 = {5, 2, 8};
+        motors = concat(motors, part1);
+      }
+    }
+  } else if (segment == 3) {
+    if (height < length1) {
+      int[] part = {6, 3};
+      motors = concat(motors, part);
+    } else if (height < length2) {
+      int[] part = {6, 3};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {5, 7, 1};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise2) {
+        int[] part1 = {5, 7, 1, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      }
+    } else if (height < length3) {
+      int[] part = {6};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {5, 7, 1};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise2) {
+        int[] part1 = {5, 7, 1, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      }
+    } else {
+      int[] part = {6};
+      motors = concat(motors, part);
+      if (leftHandRaise > raise1) {
+        int[] part1 = {5, 7, 1};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise2) {
+        int[] part1 = {5, 7, 1, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      }
+    }
+  } 
+  return motors;
+} 
 
 /**
  * Determines which motors to drive based on height.
@@ -365,7 +511,7 @@ void controlMotors(int[] motors)
   
   for (int i = 1; i < motorState.length; i++) {
     if (motorState[i] == 1) {
-      sendToModule(i, customSpeeds[i] != 0 ? customSpeeds[i] : defaultspeed);
+      sendToModule(i, customSpeeds[i] != 0 ? customSpeeds[i] : defaultSpeed);
     } else {
       sendToModule(i, 0);
     }
@@ -379,10 +525,11 @@ void controlMotors(int[] motors)
  */
 void sendToModule(int id, int value)
 {
-   serial.write((byte)77);
-   serial.write((byte)id);
-   serial.write((byte)value);
-   serial.write((byte)70);
+  value = halt ? 0 : value;
+  serial.write((byte)77);
+  serial.write((byte)id);
+  serial.write((byte)value);
+  serial.write((byte)70);
 }
 
 void keyPressed() 
