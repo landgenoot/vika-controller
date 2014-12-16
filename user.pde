@@ -38,9 +38,10 @@ int stopcount[] = new int[100];
 void setup()
 {
   // Settings
-  customSpeeds[1] = 25;
+  customSpeeds[1] = 35;
+  customSpeeds[2] = 69;
   
-  size(640,480);
+  size(1280,480);
   String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
   serial = new Serial(this, portName, 9600);
   
@@ -54,6 +55,7 @@ void setup()
   
   // enable depthMap generation 
   context.enableDepth();
+  context.enableRGB();
    
   // enable skeleton generation for all joints
   context.enableUser();
@@ -73,6 +75,8 @@ void draw()
   // draw depthImageMap
   //image(context.depthImage(),0,0);
   image(context.userImage(),0,0);
+  
+  image(context.rgbImage(), 640, 0);
   
   // draw the skeleton if it's available
   int[] userList = context.getUsers();
@@ -181,6 +185,22 @@ int height(int userId)
 }
 
 /**
+ * Returns distance of user, based on 
+ * @return int distance
+ */
+int distance(int userId)
+{
+  int distance = -1;
+  PVector headUser = head[userId];
+  try {
+    distance = (int)headUser.z;
+  } catch(Exception e) {
+    return -1;
+  }
+  return distance;
+}
+
+/**
  * Returns the segement the user is in
  * @param int userId
  */
@@ -192,9 +212,9 @@ int segment(int userId)
   PVector headUser = head[userId];
   int segment = -1;
     try {
-    if (headUser.x < -450) {
+    if (headUser.x < -400) {
       segment = 1;
-    } else if (headUser.x < 450) {
+    } else if (headUser.x < 400) {
       segment = 2;
     } else {
       segment = 3;
@@ -258,6 +278,26 @@ int rightHandRaise(int userId)
 }
 
 /**
+ * Returns the id of the user which shoulder is the nearest.
+ * @return int userid
+ */
+int getNearestUser()
+{
+  int[] userList = context.getUsers();
+  int min = 9999;
+  int nearestUser = -1;
+  for (int i = 0; i<userList.length; i++) {
+    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4) {
+      if (distance(userList[i]) < min) {
+        min = distance(userList[i]);
+        nearestUser = i;
+      }
+    }      
+  }    
+  return nearestUser == -1 ? -1 : userList[nearestUser];
+}  
+
+/**
  * Implements the logic based on the skeletons.
  */
 void logic()
@@ -265,7 +305,13 @@ void logic()
   int[] motors = {};
   int[] userList = context.getUsers();
   for (int i = 0; i < userList.length; i++) {
-    motors = concat(motors, determineMotorsForUser(userList[i]));
+    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4) {
+      motors = concat(motors, determineMotorsForUser(userList[i]));
+    }
+  }
+  int nearestUser = getNearestUser();
+  if (nearestUser > 0) {
+    //defaultSpeed = distance(nearestUser) / 20;
   }
   controlMotors(motors);
 }
@@ -288,6 +334,10 @@ int[] determineMotorsForUser(int userId) {
   int raise1 = 200;
   int raise2 = 400;
   
+  if (stopcount[userId] > 3) {
+    return motors;
+  }
+  
   
   if (segment == 1) {
     if (height < length1) {
@@ -296,31 +346,31 @@ int[] determineMotorsForUser(int userId) {
     } else if (height < length2) {
       int[] part = {4, 7};
       motors = concat(motors, part);
-      if (leftHandRaise > raise1) {
-        int[] part1 = {1, 5, 6};
-        motors = concat(motors, part1);
-      } else if (leftHandRaise > raise2) {
+      if (rightHandRaise > raise2) {
         int[] part1 = {1, 5, 6, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      } else if (rightHandRaise > raise1) {
+        int[] part1 = {1, 5, 6};
         motors = concat(motors, part1);
       }
     } else if (height < length3) {
       int[] part = {7};
       motors = concat(motors, part);
-      if (leftHandRaise > raise1) {
-        int[] part1 = {1, 5, 6};
-        motors = concat(motors, part1);
-      } else if (leftHandRaise > raise2) {
+      if (rightHandRaise > raise2) {
         int[] part1 = {1, 5, 6, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      } else if (rightHandRaise > raise1) {
+        int[] part1 = {1, 5, 6};
         motors = concat(motors, part1);
       }
     } else {
       int[] part = {7};
       motors = concat(motors, part);
-      if (leftHandRaise > raise1) {
-        int[] part1 = {1, 5, 6};
-        motors = concat(motors, part1);
-      } else if (leftHandRaise > raise2) {
+      if (rightHandRaise > raise2) {
         int[] part1 = {1, 5, 6, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      } else if (rightHandRaise > raise1) {
+        int[] part1 = {1, 5, 6};
         motors = concat(motors, part1);
       }
     }
@@ -329,22 +379,22 @@ int[] determineMotorsForUser(int userId) {
       int[] part = {1, 5, 2, 8};
       motors = concat(motors, part);
       if (leftHandRaise > raise1) {
-        int[] part1 = {6, 3};
+        int[] part1 = {4, 7};
         motors = concat(motors, part1);
       } 
       if (rightHandRaise > raise1) {
-        int[] part1 = {4, 7};
+        int[] part1 = {6, 3};
         motors = concat(motors, part1);
       }
     } else if (height < length2) {
       int[] part = {1, 5, 2};
       motors = concat(motors, part);
       if (leftHandRaise > raise1) {
-        int[] part1 = {6, 3};
+        int[] part1 = {4, 7};
         motors = concat(motors, part1);
       } 
       if (rightHandRaise > raise1) {
-        int[] part1 = {4, 7};
+        int[] part1 = {6, 3};
         motors = concat(motors, part1);
       }
       if (rightHandRaise > raise1 && leftHandRaise > raise1) {
@@ -355,11 +405,11 @@ int[] determineMotorsForUser(int userId) {
       int[] part = {1, 5};
       motors = concat(motors, part);
       if (leftHandRaise > raise1) {
-        int[] part1 = {6, 3};
+        int[] part1 = {4, 7};
         motors = concat(motors, part1);
       } 
       if (rightHandRaise > raise1) {
-        int[] part1 = {4, 7};
+        int[] part1 = {6, 3};
         motors = concat(motors, part1);
       }
       if (rightHandRaise > raise1 && leftHandRaise > raise1) {
@@ -370,11 +420,11 @@ int[] determineMotorsForUser(int userId) {
       int[] part = {1};
       motors = concat(motors, part);
       if (leftHandRaise > raise1) {
-        int[] part1 = {6, 3};
+        int[] part1 = {4, 7};
         motors = concat(motors, part1);
       } 
       if (rightHandRaise > raise1) {
-        int[] part1 = {4, 7};
+        int[] part1 = {6, 3};
         motors = concat(motors, part1);
       }
       if (rightHandRaise > raise1 && leftHandRaise > raise1) {
@@ -389,31 +439,31 @@ int[] determineMotorsForUser(int userId) {
     } else if (height < length2) {
       int[] part = {6, 3};
       motors = concat(motors, part);
-      if (leftHandRaise > raise1) {
-        int[] part1 = {5, 7, 1};
-        motors = concat(motors, part1);
-      } else if (leftHandRaise > raise2) {
+      if (leftHandRaise > raise2) {
         int[] part1 = {5, 7, 1, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise1) {
+        int[] part1 = {5, 7, 1};
         motors = concat(motors, part1);
       }
     } else if (height < length3) {
       int[] part = {6};
       motors = concat(motors, part);
-      if (leftHandRaise > raise1) {
-        int[] part1 = {5, 7, 1};
-        motors = concat(motors, part1);
-      } else if (leftHandRaise > raise2) {
+      if (leftHandRaise > raise2) {
         int[] part1 = {5, 7, 1, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise1) {
+        int[] part1 = {5, 7, 1};
         motors = concat(motors, part1);
       }
     } else {
       int[] part = {6};
       motors = concat(motors, part);
-      if (leftHandRaise > raise1) {
-        int[] part1 = {5, 7, 1};
-        motors = concat(motors, part1);
-      } else if (leftHandRaise > raise2) {
+      if (leftHandRaise > raise2) {
         int[] part1 = {5, 7, 1, 4, 3, 2, 8};
+        motors = concat(motors, part1);
+      } else if (leftHandRaise > raise1) {
+        int[] part1 = {5, 7, 1};
         motors = concat(motors, part1);
       }
     }
