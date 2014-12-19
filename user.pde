@@ -83,26 +83,20 @@ void draw()
   
   doSafetyCheck();
   
-  // draw depthImageMap
-  //image(cam1.depthImage(),0,0);
   image(cam1.userImage(),0,0);
-  
   image(safetyCam.depthImage(), 640, 0);
   
   // draw the skeleton if it's available
   int[] userList = cam1.getUsers();
   
-  for(int i=0;i<userList.length;i++)
-  {
-    if(cam1.isTrackingSkeleton(userList[i]))
-    {
+  for(int i=0;i<userList.length;i++) {
+    if(cam1.isTrackingSkeleton(userList[i])) {
       stroke(userClr[ (userList[i] - 1) % userClr.length ] );
       drawSkeleton(userList[i]);
     }      
       
     // draw the center of mass
-    if(cam1.getCoM(userList[i],com))
-    {
+    if(cam1.getCoM(userList[i],com)) {
       cam1.convertRealWorldToProjective(com,com2d);
       stroke(100,255,0);
       strokeWeight(1);
@@ -125,7 +119,6 @@ void draw()
 // draw the skeleton with the selected joints
 void drawSkeleton(int userId)
 {
-  
   float oldLeftHand = 0;
   try {
     oldLeftHand = leftHand[userId].x;
@@ -171,16 +164,13 @@ void drawSkeleton(int userId)
   cam1.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, SimpleOpenNI.SKEL_RIGHT_FOOT);  
 }
 
-// -----------------------------------------------------------------
-// SimpleOpenNI events
-
 void onNewUser(SimpleOpenNI curcam1, int userId)
 {
   curcam1.startTrackingSkeleton(userId);
 }
 
 /**
- * Returns relative length of user, based on 
+ * Returns relative length of user, based on the y-coördinate of the head.
  * @return int size
  */
 int height(int userId)
@@ -196,7 +186,7 @@ int height(int userId)
 }
 
 /**
- * Returns distance of user, based on 
+ * Returns distance of user, based on the z-coördinate of the head.
  * @return int distance
  */
 int distance(int userId)
@@ -212,7 +202,7 @@ int distance(int userId)
 }
 
 /**
- * Returns the segement the user is in
+ * Returns the segement the user is in.
  * @param int userId
  */
 int segment(int userId)
@@ -324,7 +314,9 @@ void logic()
   if (nearestUser > 0) {
     defaultSpeed = (2100-abs(distance(nearestUser)-2100))/40;
     println("speed"+defaultSpeed);
-  }
+  } else if (second() == 42) {
+    doRandomTrick();
+  }  
   controlMotors(motors);
 }
 
@@ -340,6 +332,7 @@ int[] determineMotorsForUser(int userId) {
   int height = height(userId);
   int segment = segment(userId);
   int[] motors = {};
+  
   int length1 = 300;
   int length2 = 500;
   int length3 = 600;
@@ -349,7 +342,6 @@ int[] determineMotorsForUser(int userId) {
   if (stopcount[userId] > 3) {
     return motors;
   }
-  
   
   if (segment == 1) {
     if (height < length1) {
@@ -505,27 +497,9 @@ void controlMotors(int[] motors)
 }
 
 /**
- * Send value to node via serial connection
- * @param int id Id of node
- * @param int value speed of motor
+ * Tracks two lines of the safetycam and halts if there are other objects
+ * on these lines.
  */
-void sendToModule(int id, int value)
-{
-  value = halt ? 0 : value;
-  serial.write((byte)77);
-  serial.write((byte)id);
-  serial.write((byte)value);
-  serial.write((byte)70);
-}
-
-void keyPressed() 
-{
-  if(key == ' ')
-  {
-    halt = halt ? false : true;
-  }
-}
-
 void doSafetyCheck()
 {
   safetyCam.update();
@@ -585,5 +559,38 @@ void doSafetyCheck()
   } else {
     halt = false;
   }
+}
+
+/**
+ * Turns on a random segment for 3 seconds
+ */
+void doRandomTrick()
+{
+  int duration = 2000;
+  int speed = 35;
+  int id = int(random(9));
+  for (int i = 0; i < speed; i++) {
+    sendToModule(id, i);
+    delay(50);
+  }
+  delay(duration);
+  for (int i = 0; i < speed; i++) {
+    sendToModule(id, speed-1-i);
+    delay(50);
+  }  
+}
+
+/**
+ * Send value to node via serial connection
+ * @param int id Id of node
+ * @param int value speed of motor
+ */
+void sendToModule(int id, int value)
+{
+  value = halt ? 0 : value;
+  serial.write((byte)77);
+  serial.write((byte)id);
+  serial.write((byte)value);
+  serial.write((byte)70);
 }
 
