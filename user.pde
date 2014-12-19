@@ -10,7 +10,9 @@ import processing.serial.*;
 
 import SimpleOpenNI.*;
 
-SimpleOpenNI  context;
+SimpleOpenNI  cam1;
+SimpleOpenNI  safetyCam;
+
 color[]       userClr = new color[]{ color(0,255,0),
                                      color(0,0,255),
                                      color(255,255,0),
@@ -24,6 +26,9 @@ int customSpeeds[] = new int[10];
 int gestureTimestamp = 0;
 boolean halt = false;
 
+int haltcount1 = 0;
+int haltcount2 = 0;
+
 // All location data of all users is stored here
 PVector leftHand[] = new PVector[100];
 PVector leftShoulder[] = new PVector[100];
@@ -31,9 +36,7 @@ PVector rightHand[] = new PVector[100];
 PVector rightShoulder[] = new PVector[100];
 PVector head[] = new PVector[100];
 int stopcount[] = new int[100];
-
-
-  int defaultSpeed = 55;
+int defaultSpeed = 55;
 
 void setup()
 {
@@ -41,24 +44,31 @@ void setup()
   customSpeeds[1] = 35;
   customSpeeds[2] = 69;
   
+  SimpleOpenNI.start();
+  
   size(1280,480);
   String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
   serial = new Serial(this, portName, 9600);
   
-  context = new SimpleOpenNI(this);
-  if(context.isInit() == false)
+  cam1       = new SimpleOpenNI(0, this);
+  safetyCam  = new SimpleOpenNI(1, this);
+  
+  if(cam1.isInit() == false || safetyCam.isInit() == false)
   {
-     println("Can't init SimpleOpenNI, maybe the camera is not connected!"); 
+     println("Can't init SimpleOpenNI, need at least two cams!"); 
      exit();
      return;  
   }
   
   // enable depthMap generation 
-  context.enableDepth();
-  context.enableRGB();
+  cam1.enableDepth();
+  cam1.enableRGB();
    
   // enable skeleton generation for all joints
-  context.enableUser();
+  cam1.enableUser();
+  
+  safetyCam.setMirror(true);
+  safetyCam.enableDepth();
  
   background(200,0,0);
 
@@ -70,29 +80,31 @@ void setup()
 void draw()
 {
   // update the cam
-  context.update();
+  cam1.update();
+  
+  doSafetyCheck();
   
   // draw depthImageMap
-  //image(context.depthImage(),0,0);
-  image(context.userImage(),0,0);
+  //image(cam1.depthImage(),0,0);
+  image(cam1.userImage(),0,0);
   
-  image(context.rgbImage(), 640, 0);
+  image(cam1.rgbImage(), 640, 0);
   
   // draw the skeleton if it's available
-  int[] userList = context.getUsers();
+  int[] userList = cam1.getUsers();
   
   for(int i=0;i<userList.length;i++)
   {
-    if(context.isTrackingSkeleton(userList[i]))
+    if(cam1.isTrackingSkeleton(userList[i]))
     {
       stroke(userClr[ (userList[i] - 1) % userClr.length ] );
       drawSkeleton(userList[i]);
     }      
       
     // draw the center of mass
-    if(context.getCoM(userList[i],com))
+    if(cam1.getCoM(userList[i],com))
     {
-      context.convertRealWorldToProjective(com,com2d);
+      cam1.convertRealWorldToProjective(com,com2d);
       stroke(100,255,0);
       strokeWeight(1);
       beginShape(LINES);
@@ -126,11 +138,11 @@ void drawSkeleton(int userId)
   rightShoulder[userId] = new PVector();
   head[userId] = new PVector();
   
-  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_HAND,leftHand[userId]);
-  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_SHOULDER,leftShoulder[userId]);
-  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_HAND,rightHand[userId]);
-  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_SHOULDER,rightShoulder[userId]);
-  context.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_HEAD,head[userId]);
+  cam1.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_HAND,leftHand[userId]);
+  cam1.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_SHOULDER,leftShoulder[userId]);
+  cam1.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_HAND,rightHand[userId]);
+  cam1.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_RIGHT_SHOULDER,rightShoulder[userId]);
+  cam1.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_HEAD,head[userId]);
   
   if (oldLeftHand == leftHand[userId].x) {
     stopcount[userId]++;
@@ -138,34 +150,34 @@ void drawSkeleton(int userId)
     stopcount[userId] = 0;
   }
   
-  context.drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
 
-  context.drawLimb(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_LEFT_SHOULDER);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_LEFT_ELBOW);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_ELBOW, SimpleOpenNI.SKEL_LEFT_HAND);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_LEFT_SHOULDER);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_LEFT_ELBOW);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_ELBOW, SimpleOpenNI.SKEL_LEFT_HAND);
 
-  context.drawLimb(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_RIGHT_SHOULDER);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_RIGHT_ELBOW);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, SimpleOpenNI.SKEL_RIGHT_HAND);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_RIGHT_SHOULDER);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_RIGHT_ELBOW);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, SimpleOpenNI.SKEL_RIGHT_HAND);
 
-  context.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_TORSO);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_TORSO);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_TORSO);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_TORSO);
 
-  context.drawLimb(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_LEFT_HIP);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_HIP, SimpleOpenNI.SKEL_LEFT_KNEE);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_KNEE, SimpleOpenNI.SKEL_LEFT_FOOT);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_LEFT_HIP);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_HIP, SimpleOpenNI.SKEL_LEFT_KNEE);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_KNEE, SimpleOpenNI.SKEL_LEFT_FOOT);
 
-  context.drawLimb(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_RIGHT_HIP);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_RIGHT_KNEE);
-  context.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, SimpleOpenNI.SKEL_RIGHT_FOOT);  
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_RIGHT_HIP);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_RIGHT_KNEE);
+  cam1.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, SimpleOpenNI.SKEL_RIGHT_FOOT);  
 }
 
 // -----------------------------------------------------------------
 // SimpleOpenNI events
 
-void onNewUser(SimpleOpenNI curContext, int userId)
+void onNewUser(SimpleOpenNI curcam1, int userId)
 {
-  curContext.startTrackingSkeleton(userId);
+  curcam1.startTrackingSkeleton(userId);
 }
 
 /**
@@ -283,11 +295,11 @@ int rightHandRaise(int userId)
  */
 int getNearestUser()
 {
-  int[] userList = context.getUsers();
+  int[] userList = cam1.getUsers();
   int min = 9999;
   int nearestUser = -1;
   for (int i = 0; i<userList.length; i++) {
-    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4) {
+    if (cam1.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4) {
       if (distance(userList[i]) < min) {
         min = distance(userList[i]);
         nearestUser = i;
@@ -303,15 +315,16 @@ int getNearestUser()
 void logic()
 { 
   int[] motors = {};
-  int[] userList = context.getUsers();
+  int[] userList = cam1.getUsers();
   for (int i = 0; i < userList.length; i++) {
-    if (context.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4) {
+    if (cam1.isTrackingSkeleton(userList[i]) && stopcount[userList[i]] < 4) {
       motors = concat(motors, determineMotorsForUser(userList[i]));
     }
   }
   int nearestUser = getNearestUser();
   if (nearestUser > 0) {
-    //defaultSpeed = distance(nearestUser) / 20;
+    defaultSpeed = (2100-abs(distance(nearestUser)-2100))/40;
+    println("speed"+defaultSpeed);
   }
   controlMotors(motors);
 }
@@ -472,82 +485,6 @@ int[] determineMotorsForUser(int userId) {
 } 
 
 /**
- * Determines which motors to drive based on height.
- * @param int height of user
- * @return int[] motors which must be turned on
- */
-int[] determineMotors(int length, int width)
-{
-  println("length: "+ length);
-  int[] motors = new int[10]; 
-  if (length > 570) {
-    motors[1] = 1;
-    if (width < 700) {
-      // Nothing to add
-    } else if (width < 1200) {
-      motors[5] = 1;
-      motors[6] = 1;
-      motors[7] = 1;
-    } else {
-      motors[5] = 1;
-      motors[6] = 1;
-      motors[7] = 1;
-      motors[3] = 1;
-      motors[4] = 1;
-      motors[2] = 1;
-      motors[8] = 1;
-    }
-  } else if (length > 400) {
-    motors[1] = 1;
-    motors[5] = 1;
-    motors[6] = 1;
-    motors[7] = 1;
-    if (width < 300) {
-      // Nothing to add
-    } else if (width < 500) {
-      motors[3] = 1;
-      motors[4] = 1;
-    } else {
-      motors[3] = 1;
-      motors[4] = 1;
-      motors[9] = 1;
-    }
-  } else if (length > 250) {
-    motors[1] = 1;
-    motors[2] = 1;
-    motors[5] = 1;
-    motors[3] = 1;
-    motors[4] = 1;
-    motors[6] = 1;
-    motors[7] = 1;
-    motors[9] = 1;
-    if (width < 300) {
-      // Nothing to add
-    } else if (width < 500) {
-      motors[3] = 1;
-      motors[4] = 1;
-    } else {
-      motors[3] = 1;
-      motors[4] = 1;
-      motors[9] = 1;
-    }
-  } else {
-    if (width < 700) {
-      motors[1] = 1;
-      motors[2] = 1;
-      motors[3] = 1;
-      motors[4] = 1;
-      motors[5] = 1;
-      motors[6] = 1;
-      motors[7] = 1;
-      motors[8] = 1;
-      motors[9] = 1;
-    }
-  }
-  return motors;
-}
-
-/**
  * Reads an array containing the id's of the motors which need to be turned on.
  * @param int[] motors
  */
@@ -589,3 +526,65 @@ void keyPressed()
     halt = halt ? false : true;
   }
 }
+
+void doSafetyCheck()
+{
+  safetyCam.update();
+  
+  background(200, 0, 0);
+
+  PImage depthImage = safetyCam.depthImage();
+
+  // draw depthImageMap
+  image(depthImage, 0, 0);
+  
+  int b1 = 220;
+  int b2 = 390;
+  float sum1 = 0;
+  float sum2 = 0;
+  float previous1 = 0;
+  float previous2 = 0;
+  
+  for (int i = 0; i < 640; i++) {
+    if (red(depthImage.get(i, b1)) > 20) { 
+      sum1 = pow(abs(previous1 - red(depthImage.get(i, b1))),2) + sum1;
+      previous1 = red(depthImage.get(i, b1));
+    }
+  }
+  for (int i = 0; i < 640; i++) {
+    if (red(depthImage.get(i, b2)) > 20) { 
+      sum2 = pow(abs(previous2 - red(depthImage.get(i, b2))), 2) + sum2;
+      previous2 = red(depthImage.get(i, b2));
+    }
+  }
+  boolean halt1, halt2;
+  if (sum1 > 60000) {
+    if (haltcount1 > 3) {
+      halt1 = true;
+    } else {
+      halt1 = false;
+    }
+    haltcount1++;
+  } else {
+    halt1 = false;
+    haltcount1 = 0;
+  }
+  if (sum2 > 60000) {
+    if (haltcount2 > 3) {
+      halt2 = true;
+    } else {
+      halt2 = false;
+    }
+    haltcount2++;
+  } else {
+    halt2 = false;
+    haltcount2 = 0;
+  }
+
+  if (halt1 || halt2) {
+    halt = true;
+  } else {
+    halt = false;
+  }
+}
+
