@@ -62,7 +62,6 @@ void setup()
   
   // enable depthMap generation 
   cam1.enableDepth();
-  cam1.enableRGB();
    
   // enable skeleton generation for all joints
   cam1.enableUser();
@@ -88,7 +87,7 @@ void draw()
   //image(cam1.depthImage(),0,0);
   image(cam1.userImage(),0,0);
   
-  image(cam1.rgbImage(), 640, 0);
+  image(safetyCam.depthImage(), 640, 0);
   
   // draw the skeleton if it's available
   int[] userList = cam1.getUsers();
