@@ -47,11 +47,11 @@ void setup()
   SimpleOpenNI.start();
   
   size(1280,480);
-  String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
+  String portName = Serial.list()[4]; //change the 0 to a 1 or 2 etc. to match your port
   serial = new Serial(this, portName, 9600);
   
-  cam1       = new SimpleOpenNI(0, this);
-  safetyCam  = new SimpleOpenNI(1, this);
+  cam1       = new SimpleOpenNI(1, this);
+  safetyCam  = new SimpleOpenNI(0, this);
   
   if(cam1.isInit() == false || safetyCam.isInit() == false)
   {
@@ -129,6 +129,7 @@ void drawSkeleton(int userId)
   rightHand[userId] = new PVector();
   rightShoulder[userId] = new PVector();
   head[userId] = new PVector();
+  
   
   cam1.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_HAND,leftHand[userId]);
   cam1.getJointPositionSkeleton(userId,SimpleOpenNI.SKEL_LEFT_SHOULDER,leftShoulder[userId]);
@@ -214,11 +215,11 @@ int segment(int userId)
   int segment = -1;
     try {
     if (headUser.x < -400) {
-      segment = 1;
+      segment = 3;
     } else if (headUser.x < 400) {
       segment = 2;
     } else {
-      segment = 3;
+      segment = 1;
     }
     println("segment: "+segment);
   } catch (Exception e) {
@@ -313,7 +314,7 @@ void logic()
   int nearestUser = getNearestUser();
   if (nearestUser > 0) {
     defaultSpeed = (2100-abs(distance(nearestUser)-2100))/40;
-    println("speed"+defaultSpeed);
+    println("stopcount: "+stopcount[nearestUser]);
   } else if (second() == 42) {
     doRandomTrick();
   }  
@@ -327,8 +328,8 @@ void logic()
  */
 int[] determineMotorsForUser(int userId) {
   // Get skeleton parts
-  int leftHandRaise = leftHandRaise(userId);
-  int rightHandRaise = rightHandRaise(userId);
+  int leftHandRaise = rightHandRaise(userId);
+  int rightHandRaise = leftHandRaise(userId);
   int height = height(userId);
   int segment = segment(userId);
   int[] motors = {};
@@ -568,7 +569,7 @@ void doRandomTrick()
 {
   int duration = 2000;
   int speed = 35;
-  int id = int(random(9));
+  int id = int(random(8))+1;
   for (int i = 0; i < speed; i++) {
     sendToModule(id, i);
     delay(50);
