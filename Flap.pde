@@ -10,20 +10,31 @@
  
 class Flap
 {
-  private int id, posX, posY, speed;
+  private int id;
   private int maxSpeed = 127;
+  private float speed;
   private float speedCorrection = 0.75;
+  public int x, y;
   
   public Flap(int id, int posX, int posY)
   {
     this.id = id;
-    this.posX = posX;
-    this.posY = posY;
+    this.x = posX;
+    this.y = posY;
   }
   
   public void speed(float speed)
   {
     this.speed = speed;
+    this.update();
+  }
+  
+  /**
+   * Adjusts the speed to 50% of the current speed.
+   */
+  public void fadeOut()
+  {
+    this.speed = this.speed/2;
     this.update();
   }
   
@@ -40,9 +51,4 @@ class Flap
     serial.write((byte)value);
     serial.write((byte)255);
   }
-  
-  public int x() { return posX; }
-  
-  public int y() { return posY; }
-  
 }

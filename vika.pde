@@ -5,9 +5,19 @@ import processing.serial.*;
 /**
  * Master computer for controlling an interactive environment 
  * using multiple Microsoft Kincts.
+ 
+ Coordinate system in CM:
+ 
+   ----------------------------
+   |                          |
+y  |  Front of installation   |
+^  |                          |
+|  ----------------------------
+O --> x
+ 
  * 
  * @author Daan Middendorp <github-d@landgenoot.com>
- * @copyright TU Delft 2014
+ * @copyright TU Delft 2015
  */
 
 SimpleOpenNI cam1;
