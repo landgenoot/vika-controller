@@ -33,10 +33,15 @@ void setup()
   }
   
   Flap[] flaps = { 
-    new Flap(0, 10, 10)
+    new Flap(0, new Point(10, 10))
   };
   
   controller.registerSegment(segments);
   controller.registerFlaps(flaps);
   
+}
+
+void draw()
+{
+  controller.update(); 
 }

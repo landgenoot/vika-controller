@@ -14,13 +14,12 @@ class Flap
   private int maxSpeed = 127;
   private float speed;
   private float speedCorrection = 0.75;
-  public int x, y;
+  public Point location;
   
-  public Flap(int id, int posX, int posY)
+  public Flap(int id, Point location)
   {
     this.id = id;
-    this.x = posX;
-    this.y = posY;
+    this.location = location;
   }
   
   public void speed(float speed)
@@ -30,11 +29,12 @@ class Flap
   }
   
   /**
-   * Adjusts the speed to 50% of the current speed.
+   * Adjusts the speed to 80% of the current speed, resulting
+   * in a fade-out effect.
    */
   public void fadeOut()
   {
-    this.speed = this.speed/2;
+    this.speed = this.speed*0.8;
     this.update();
   }
   

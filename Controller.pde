@@ -30,11 +30,28 @@ class Controller
    }
  }
  
- public void drawSquare(Square square)
+ public void drawSquare(Square square, float speed)
  {
    for (Flap flap : flaps) {
-     
+     if (square.isInside(flap.getPoint())) {
+       flap.speed(speed);
+     }
    }  
+ }
+ 
+ public void update()
+ {
+   this.fadeAll();
+ }
+ 
+ /**
+  * Fades all the registered flaps
+  */
+ private void fadeOutAll()
+ {
+   for (Flap flap : flaps) {
+     flap.fadeOut();
+   }
  }
  
  public void registerFlap(Flap flaps) { this.flaps = flaps; }
