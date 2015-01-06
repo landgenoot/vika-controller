@@ -2,16 +2,26 @@
 class Controller
 {
   
- ArrayList<Flap> flaps = new ArrayList<Flap>();
- ArrayList<Segment> segments = new ArrayList<Segment>();
+ Flap[] flaps;
+ Segment[] segments;
   
  public Controller()
  {
+   SimpleOpenNI.start();
    
  }
  
- public void registerFlap(Flap flap) { flaps.add(flap); }
+ public void init()
+ {
+   for (Segment segment : segments) {
+     if (segment.init() == false) {
+       println("Can't init segment #" + segment.id);
+     } 
+   }
+ }
  
- public void registerSegment(Segment segment) { segments.add(segment); }
+ public void registerFlap(Flap flaps) { this.flaps = flaps; }
+ 
+ public void registerSegment(Segment segments) { this.segments = segments; }
  
 }
