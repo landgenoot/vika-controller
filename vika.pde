@@ -20,13 +20,11 @@ O --> x
  * @copyright TU Delft 2015
  */
 
-SimpleOpenNI cam1;
-SimpleOpenNI safetyCam;
+
 
 void setup()
 {
-  
-  Controller controller = new Controller();
+  Controller controller = Controller.getInstance();
   
   Segment[] segments = {
     new Segment(new SimpleOpenNI(1, this));
@@ -36,9 +34,11 @@ void setup()
     new Flap(0, new Point(10, 10))
   };
   
+  SafetyMechanism safetyMechanism = new SafetyMechanism(new SimpleOpenNI(0, this));
+  
   controller.registerSegment(segments);
   controller.registerFlaps(flaps);
-  
+  controller.registerSafetyMechanism(safetyMechanism);
 }
 
 void draw()

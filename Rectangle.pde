@@ -6,7 +6,7 @@
  * @copyright TU Delft 2015
  */
 
-class Square 
+class Rectangle 
 {
   public Point origin;
   public int width, height;

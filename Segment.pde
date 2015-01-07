@@ -11,16 +11,31 @@
 class Segment
 {
   SimpleOpenNI kinect;
+  ArrayList<User> users = new ArrayList<User>();
+  Rectangle controllingArea;
   
   /**
    * Constructs a new segment
    * @param kinect a SimpleOpenNI instance
-   * @param posX int of the x-location were the segment begins
-   * @param widthX int of the width of the installation
+   * @param controllingArea is the space which is controlled by this segment.
    */
-  Segment(SimpleOpenNI kinect, int posX, int widthX)
+  Segment(SimpleOpenNI kinect, Rectangle controllingArea)
   {
+    this.kinect = kinect;
+    this.controllingArea = controllingArea;
+  } 
+ 
+  void update()
+  {
+    kinect.update();
+    int[] userList = kinect.getUsers();
     
-  }  
+    for (int userId : userList) {
+      if (users.size() <= userId) {
+        users.add(new User(userId));
+      }
+      
+    }
+  } 
   
 }

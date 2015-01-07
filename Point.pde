@@ -14,7 +14,7 @@ class Point
   Point(int x, int y) 
   {
     this.x = x;
-    tnis.y = y;
+    this.y = y;
   }
 }
 
