@@ -19,7 +19,6 @@ class Controller
   public Controller()
   {
     SimpleOpenNI.start();
-    
   }
  
   public void init()

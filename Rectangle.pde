@@ -21,13 +21,24 @@ class Rectangle
   /**
    * Determines if a point is located inside this square.
    */
-  boolean isInside(Point p)
+  public boolean isInside(Point p)
   {
     if (origin.x > p.x || origin.y > p.y || origin.x+width < p.x || origin.y+heigth < p.y) {
       return false; 
     } else {
       return true;
     }
+  }
+  
+  /**
+   * Moves the rectangle. This is used to place figures on the correct segment.
+   * @param int x-correction
+   * @param int y-correction
+   */
+  public void transform(int x, int y)
+  {
+    origin.x = origin.x + x;
+    origin.y = origin.y + y;
   }
 }
 

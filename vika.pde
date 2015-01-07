@@ -4,7 +4,7 @@ import processing.serial.*;
 
 /**
  * Master computer for controlling an interactive environment 
- * using multiple Microsoft Kincts.
+ * using multiple Microsoft Kinects.
  
  Coordinate system in CM:
  

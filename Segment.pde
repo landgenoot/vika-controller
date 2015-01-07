@@ -20,20 +20,19 @@ class Segment
    * @param kinect a SimpleOpenNI instance
    * @param controllingArea is the space which is controlled by this segment.
    */
-  Segment(int id, SimpleOpenNI kinect, Rectangle controllingArea)
+  public Segment(int id, SimpleOpenNI kinect, Rectangle controllingArea)
   {
     this.kinect = kinect;
     this.controllingArea = controllingArea;
     this.kinect.enableDepth();
     this.kinect.enableUser();
-    
   } 
  
   /**
    * Checks for new users and updates triggers all the logic 
    * of all the users.
    */
-  void update()
+  public void update()
   {
     kinect.update();
     image(kinect.userImage(), 
@@ -43,10 +42,17 @@ class Segment
       try {
         user = users.get(userId);
       } catch (IndexOutOfBoundsException e) {
-        users.add(i, new User(userId));
+        users.add(i, new User(userId, this));
         user = users.get(userId);
       }
       user.update(this.kinect);
+      this.drawBaseRectangle(this.getBaseRectangle);
     }
   } 
+  
+  private void drawBaseRectangle()
+  {
+    rectangle.transform(controllingArea.origin.x, controllingArea.origin.y);
+    
+  }
 }
