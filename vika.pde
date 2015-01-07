@@ -27,8 +27,19 @@ void setup()
   Controller controller = Controller.getInstance();
   
   Segment[] segments = {
-    new Segment(new SimpleOpenNI(1, this));
+    new Segment(0, new SimpleOpenNI(1, this),
+      new Rectangle(
+        new Point(0, 0),
+        120, 
+        220
+      ))
   }
+  
+  size(640*segments.length, 480
+  background(200,0,0);
+  stroke(0,0,255);
+  strokeWeight(3);
+  smooth(); )
   
   Flap[] flaps = { 
     new Flap(0, new Point(10, 10))

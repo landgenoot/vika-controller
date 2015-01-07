@@ -10,6 +10,7 @@
 
 class Segment
 {
+  int id;
   SimpleOpenNI kinect;
   ArrayList<User> users = new ArrayList<User>();
   Rectangle controllingArea;
@@ -19,23 +20,33 @@ class Segment
    * @param kinect a SimpleOpenNI instance
    * @param controllingArea is the space which is controlled by this segment.
    */
-  Segment(SimpleOpenNI kinect, Rectangle controllingArea)
+  Segment(int id, SimpleOpenNI kinect, Rectangle controllingArea)
   {
     this.kinect = kinect;
     this.controllingArea = controllingArea;
+    this.kinect.enableDepth();
+    this.kinect.enableUser();
+    
   } 
  
+  /**
+   * Checks for new users and updates triggers all the logic 
+   * of all the users.
+   */
   void update()
   {
     kinect.update();
+    image(kinect.userImage(), 
     int[] userList = kinect.getUsers();
     
     for (int userId : userList) {
-      if (users.size() <= userId) {
-        users.add(new User(userId));
+      try {
+        user = users.get(userId);
+      } catch (IndexOutOfBoundsException e) {
+        users.add(i, new User(userId));
+        user = users.get(userId);
       }
-      
+      user.update(this.kinect);
     }
   } 
-  
 }

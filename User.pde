@@ -17,11 +17,52 @@ class User
   public PVector rightShoulder;
   public PVector head;
   
-  User(int id)
+  public User(int id)
   {
-    
+    this.id = id;
   }
   
+  /**
+   * Method runs every frame.
+   */
+  public void update(SimpleOpenNI kinect)
+  {
+    this.updatePositions(kinect);  
+  }
   
+  /**
+   * Fetches the position data of a couple of skeleton joints and
+   * stores them in its own properties.
+   *
+   * @param SimpleOpenNI kinect from the segment the user is in.
+   */
+  private void updatePositions(SimpleOpenNI kinect)
+  {
+    kinect.getJointPositionSkeleton(
+      this.id,
+      SimpleOpenNI.SKEL_LEFT_HAND,
+      this.leftHand
+    );
+    kinect.getJointPositionSkeleton(
+      this.id,
+      SimpleOpenNI.SKEL_LEFT_SHOULDER,
+      this.leftShoulder
+    );
+    kinect.getJointPositionSkeleton(
+      this.id,
+      SimpleOpenNI.SKEL_RIGHT_HAND,
+      this.rightHand
+    );
+    kinect.getJointPositionSkeleton(
+      this.id,
+      SimpleOpenNI.SKEL_RIGHT_SHOULDER,
+      this.rightShoulder
+    );
+    kinect.getJointPositionSkeleton(
+      this.id,
+      SimpleOpenNI.SKEL_HEAD,
+      this.head
+    );
+  }
 }
 

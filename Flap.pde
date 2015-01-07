@@ -34,8 +34,11 @@ class Flap
    */
   public void fadeOut()
   {
-    this.speed = this.speed*0.8;
-    this.update();
+    if (this.speed != 0.0) {
+      // Turn of motor is speed drops below 0.1
+      this.speed = this.speed*0.8 > 0.1 ? this.speed*0.8 : 0.0;
+      this.update();
+    }
   }
   
   /**

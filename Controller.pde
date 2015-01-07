@@ -1,6 +1,7 @@
 
 /**
  * The controller manages the different other classes.
+ * Singleton implementation, to make sure we are dealing with only one controller.
  *
  * @author Daan Middendorp <github-d@landgenoot.com>
  * @copyright TU Delft 2015
@@ -8,7 +9,6 @@
  
 class Controller
 {
-  
   Controller _instance;
   
   Flap[] flaps;
@@ -16,7 +16,7 @@ class Controller
   SafetyMechanism safetyMechanism;
   boolean halt = false;
    
-  public Conttroller()
+  public Controller()
   {
     SimpleOpenNI.start();
     
@@ -52,6 +52,9 @@ class Controller
       haltAll();
     } else {
       this.fadeAll();
+      for (Segment segment : segments) {
+        segment.update();
+      }
     }
   }
   
