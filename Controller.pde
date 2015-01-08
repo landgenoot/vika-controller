@@ -7,16 +7,16 @@
  * @copyright TU Delft 2015
  */
  
-class Controller
+static class Controller
 {
-  Controller _instance;
+  static Controller _instance;
   
   Flap[] flaps;
   Segment[] segments;
   SafetyMechanism safetyMechanism;
   boolean halt = false;
    
-  public Controller()
+  private Controller()
   {
     SimpleOpenNI.start();
   }
@@ -27,7 +27,6 @@ class Controller
     for (Segment segment : segments) {
       if (segment.init() == false) {
         println("Can't init segment #" + i);
-        exit();
       } 
       i++;
     }
@@ -36,10 +35,10 @@ class Controller
     }
   }
  
-  public void drawSquare(Square square, float speed)
+  public void drawSquare(Rectangle rectangle, float speed)
   {
     for (Flap flap : flaps) {
-      if (square.isInside(flap.getPoint())) {
+      if (rectangle.isInside(flap.location)) {
         flap.speed(speed);
       }
     }  
@@ -50,7 +49,7 @@ class Controller
     if (this.safetyMechanism != null && this.safetyMechanism.isHalt()) {
       haltAll();
     } else {
-      this.fadeAll();
+      this.fadeOutAll();
       for (Segment segment : segments) {
         segment.update();
       }
@@ -77,13 +76,13 @@ class Controller
     }
   }
  
-  public void registerFlap(Flap flaps) { this.flaps = flaps; }
+  public void registerFlaps(Flap flaps[]) { this.flaps = flaps; }
  
-  public void registerSegment(Segment segments) { this.segments = segments }
+  public void registerSegments(Segment segments[]) { this.segments = segments; }
  
-  public void registerSafetyMechanism(SafetyMechanism safetyMechanism) { this safetyMechanism = safetypMechanism; }
+  public void registerSafetyMechanism(SafetyMechanism safetyMechanism) { this.safetyMechanism = safetyMechanism; }
 
-  private synchronized static void createInstance()
+  private static void createInstance()
   {
     if (_instance == null) {
       _instance = new Controller();
@@ -92,7 +91,7 @@ class Controller
   
   public static Controller getInstance () {
     if (_instance == null) {
-      this.createInstance();
+      createInstance();
     }
     return _instance;
   }

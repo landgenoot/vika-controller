@@ -27,6 +27,11 @@ class Segment
     this.kinect.enableDepth();
     this.kinect.enableUser();
   } 
+  
+  public boolean init()
+  {
+    return true;
+  }
  
   /**
    * Checks for new users and updates triggers all the logic 
@@ -35,7 +40,7 @@ class Segment
   public void update()
   {
     kinect.update();
-    image(kinect.userImage(), 
+    image(kinect.userImage());
     int[] userList = kinect.getUsers();
     
     for (int userId : userList) {
@@ -50,9 +55,9 @@ class Segment
     }
   } 
   
-  private void drawBaseRectangle()
+  private void drawBaseRectangle(User user)
   {
-    rectangle.transform(controllingArea.origin.x, controllingArea.origin.y);
+    
     
   }
 }

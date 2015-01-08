@@ -6,7 +6,7 @@
  * @copyright TU Delft 2015
  */
 
-class SingletonSerial
+static class SingletonSerial
 {
   private static Serial _instance = null;
   
@@ -20,7 +20,7 @@ class SingletonSerial
     }
   }
   
-  public static Singleton getInstance () {
+  public static Serial getInstance () {
     if (_instance == null) {
       createInstance ();
     }

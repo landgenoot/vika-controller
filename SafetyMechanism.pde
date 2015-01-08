@@ -21,6 +21,11 @@ class SafetyMechanism
     this.lines = lines;
   }
   
+  public boolean init()
+  {
+    return true;
+  }
+  
   public boolean isHalt()
   {
     return false;

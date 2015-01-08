@@ -11,7 +11,7 @@ class Rectangle
   public Point origin;
   public int width, height;
 
-  Square(Point origin, int width, int height) 
+  Rectangle(Point origin, int width, int height) 
   {
     this.origin = origin;
     this.width = width;
