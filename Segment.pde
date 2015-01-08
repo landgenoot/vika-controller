@@ -14,7 +14,7 @@ class Segment
   int id;
   SimpleOpenNI kinect;
   Map<Integer, User> users = new HashMap<Integer, User>();
-  Rectangle controllingArea;
+  public Rectangle controllingArea;
   Point kinectLocation;
   
   /**

@@ -10,7 +10,7 @@
  
 class Flap
 {
-  private int id;
+  public int id;
   private int maxSpeed = 127;
   private float speed;
   private float speedCorrection = 0.75;
@@ -47,7 +47,7 @@ class Flap
   private void update()
   {
     Serial serial = SingletonSerial.getInstance();
-    Simulation simulation = Simulation.getInstance();
+    //Simulation simulation = Simulation.getInstance();
     if (serial != null) {
       int value = int(speed*speedCorrection*maxSpeed);
       
@@ -55,9 +55,6 @@ class Flap
       serial.write((byte)this.id);
       serial.write((byte)value);
       serial.write((byte)255);
-    }
-    if (simulation != null) {
-      
     }
   }
 }

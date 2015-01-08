@@ -14,6 +14,7 @@ static class Controller
   public Flap[] flaps;
   public Segment[] segments;
   SafetyMechanism safetyMechanism;
+  Simulation simulation;
   boolean halt = false;
    
   private Controller()
