@@ -1,3 +1,4 @@
+import java.util.Map;
 
 /**
  * A segment is basically a part of the installation controlled by
@@ -12,18 +13,20 @@ class Segment
 {
   int id;
   SimpleOpenNI kinect;
-  ArrayList<User> users = new ArrayList<User>();
+  Map<Integer, User> users = new HashMap<Integer, User>();
   Rectangle controllingArea;
+  Point kinectLocation;
   
   /**
    * Constructs a new segment
    * @param kinect a SimpleOpenNI instance
    * @param controllingArea is the space which is controlled by this segment.
    */
-  public Segment(int id, SimpleOpenNI kinect, Rectangle controllingArea)
+  public Segment(int id, SimpleOpenNI kinect, Rectangle controllingArea, Point kinectLocation)
   {
     this.kinect = kinect;
     this.controllingArea = controllingArea;
+    this.kinectLocation = kinectLocation;
     this.kinect.enableDepth();
     this.kinect.enableUser();
   } 
@@ -40,17 +43,15 @@ class Segment
   public void update()
   {
     kinect.update();
-    image(kinect.userImage(), 640*id, 0);
+    image(kinect.userImage(), 640+640*id, 0);
     int[] userList = kinect.getUsers();
     
     User user;
     for (int userId : userList) {
-      try {
-        user = users.get(userId);
-      } catch (IndexOutOfBoundsException e) {
-        users.add(userId, new User(userId));
-        user = users.get(userId);
+      if (users.get(new Integer(userId)) == null) {
+        users.put(new Integer(userId), new User(userId));
       }
+      user = users.get(userId);
       user.update(this.kinect);
       this.drawBaseRectangle(user);
     }
@@ -58,7 +59,22 @@ class Segment
   
   private void drawBaseRectangle(User user)
   {
+    Controller controller = Controller.getInstance();
     
+    int projectionHeight = int(min(1.0, 1.2-user.getHeight()) * this.controllingArea.height);
+    int verticalProjectionPosition = int(user.getVerticalPosition() * this.controllingArea.width);
+    
+    Rectangle userProjection = new Rectangle(
+      new Point(verticalProjectionPosition, 0),
+      50,
+      projectionHeight
+    );
+    
+    controller.drawRectangle(userProjection, 1);
+    if (user.isActive()) {
+      //println(userProjection.toString());
+      println(user.getHeight());
+    }
     
   }
 }

@@ -47,11 +47,17 @@ class Flap
   private void update()
   {
     Serial serial = SingletonSerial.getInstance();
-    int value = int(speed*speedCorrection*maxSpeed);
-    
-    serial.write((byte)254); // @note: changed due to interference with speed values
-    serial.write((byte)this.id);
-    serial.write((byte)value);
-    serial.write((byte)255);
+    Simulation simulation = Simulation.getInstance();
+    if (serial != null) {
+      int value = int(speed*speedCorrection*maxSpeed);
+      
+      serial.write((byte)254); // @note: changed due to interference with speed values
+      serial.write((byte)this.id);
+      serial.write((byte)value);
+      serial.write((byte)255);
+    }
+    if (simulation != null) {
+      
+    }
   }
 }

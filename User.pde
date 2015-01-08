@@ -10,12 +10,14 @@
 class User
 {
   public int id;
-  public int stopcount;
-  public PVector leftHand;
-  public PVector leftShoulder;
-  public PVector rightHand;
-  public PVector rightShoulder;
-  public PVector head;
+  private int stopcount;
+  public PVector leftHand = new PVector();
+  public PVector leftShoulder = new PVector();
+  public PVector rightHand = new PVector();
+  public PVector rightShoulder = new PVector();
+  public PVector head = new PVector();
+  public PVector rightFoot = new PVector();
+  public float previousHeadX;
   
   public User(int id)
   {
@@ -28,6 +30,38 @@ class User
   public void update(SimpleOpenNI kinect)
   {
     this.updatePositions(kinect);  
+    this.updateStopcount();
+  }
+  
+  /**
+   * Returns length of the user in CM
+   */
+  public float getHeight()
+  {
+    return (head.y/10)-(rightFoot.y/10);
+  }
+  
+  public float getVerticalPosition()
+  {
+    return head.x/1000;
+  }
+  
+  public void updateStopcount()
+  {
+    if (previousHeadX == head.x)
+    {
+      stopcount++;
+    } else {
+      stopcount = 0;
+    }
+  }
+  
+  /**
+   * Returns false is the user hasn't moved for 3 frames.
+   */
+  public boolean isActive()
+  {
+    return (stopcount > 3 ? false : true);
   }
   
   /**
@@ -38,6 +72,7 @@ class User
    */
   private void updatePositions(SimpleOpenNI kinect)
   {
+    previousHeadX = head.x;
     kinect.getJointPositionSkeleton(
       this.id,
       SimpleOpenNI.SKEL_LEFT_HAND,
@@ -62,6 +97,11 @@ class User
       this.id,
       SimpleOpenNI.SKEL_HEAD,
       this.head
+    );
+    kinect.getJointPositionSkeleton(
+      this.id,
+      SimpleOpenNI.SKEL_RIGHT_FOOT,
+      this.rightFoot
     );
   }
 }

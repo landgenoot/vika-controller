@@ -40,5 +40,10 @@ class Rectangle
     origin.x = origin.x + x;
     origin.y = origin.y + y;
   }
+  
+  public String toString()
+  {
+    return "Rectangle(" + origin.toString() + ", " + this.width + ", " + this.height + ")";
+  }
 }
 

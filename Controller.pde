@@ -11,8 +11,8 @@ static class Controller
 {
   static Controller _instance;
   
-  Flap[] flaps;
-  Segment[] segments;
+  public Flap[] flaps;
+  public Segment[] segments;
   SafetyMechanism safetyMechanism;
   boolean halt = false;
    
@@ -35,7 +35,7 @@ static class Controller
     }
   }
  
-  public void drawSquare(Rectangle rectangle, float speed)
+  public void drawRectangle(Rectangle rectangle, float speed)
   {
     for (Flap flap : flaps) {
       if (rectangle.isInside(flap.location)) {
