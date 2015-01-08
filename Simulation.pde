@@ -19,31 +19,35 @@ class Simulation
     this.scale = scale;
   }
   
-  public void init()
+  public void update()
   {
-    textSize(36);
-    text("Vika controller", 100, 100);
+    clear();
+    background(50,50,50);
+    pushMatrix();
+    textSize(26);
+    text("Vika controller", 110, 40);
     Controller controller = Controller.getInstance();
+    popMatrix();
     strokeWeight(1);
     for (Flap flap : controller.flaps) {
-      drawFlap(flap);
+      drawFlap(flap, flap.speed);
     }
     for (Segment segment : controller.segments) {
       drawSegment(segment);
     }
   }
   
-  private void drawFlap(Flap flap) 
+  private void drawFlap(Flap flap, float speed) 
   {
     pushMatrix();
-    translate(this.x+flap.location.x, this.y-flap.location.y);
+    translate(this.x+flap.location.x*scale, this.y-flap.location.y*scale);
     strokeWeight(1);
-    fill(160);
-    polygon(0, 0, 15, 6); 
-    fill(0);
-    textSize(10);
+    fill(140 - speed*140);
+    polygon(0, 0, 15*scale, 6); 
+    fill(255);
+    textSize(10*scale);
     textAlign(CENTER);
-    text("   "+flap.id, -5, 4); 
+    text("   "+flap.id, -5*scale, 4*scale); 
     popMatrix();
   }
   

@@ -24,10 +24,11 @@ O --> x
 Controller controller;
 Simulation simulation;
 
+int x = 0;
 void setup()
 {
   controller = Controller.getInstance();
-  simulation = new Simulation(100, 400, 1);
+  simulation = new Simulation(75, 475, 1.5);
   
   //SingletonSerial.createInstance(this, 0);
   
@@ -42,7 +43,6 @@ void setup()
   };
   
   size(640 + 640*segments.length, 480);
-  background(50,50,50);
   stroke(0,0,255);
   strokeWeight(3);
   smooth(); 
@@ -132,13 +132,26 @@ void setup()
   
   controller.registerSegments(segments);
   controller.registerFlaps(flaps);
-  simulation.init();
   //controller.registerSafetyMechanism(safetyMechanism);
 }
 
 void draw()
 {
+  //controller.flaps[int(random(77))].speed(1);
+  simulation.update();
   controller.update(); 
+  delay(10);
+  
+  
+  controller.drawRectangle(
+    new Rectangle(
+      new Point(0,x),
+      320,
+      20
+    ),
+    1
+  );
+  x = x+5;
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)
