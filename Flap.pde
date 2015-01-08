@@ -47,7 +47,7 @@ class Flap
   private void update()
   {
     Serial serial = SingletonSerial.getInstance();
-    int value = speed*speedCorrection*maxSpeed;
+    int value = int(speed*speedCorrection*maxSpeed);
     
     serial.write((byte)254); // @note: changed due to interference with speed values
     serial.write((byte)this.id);

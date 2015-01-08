@@ -40,18 +40,19 @@ class Segment
   public void update()
   {
     kinect.update();
-    image(kinect.userImage());
+    image(kinect.userImage(), 640*id, 0);
     int[] userList = kinect.getUsers();
     
+    User user;
     for (int userId : userList) {
       try {
         user = users.get(userId);
       } catch (IndexOutOfBoundsException e) {
-        users.add(i, new User(userId, this));
+        users.add(userId, new User(userId));
         user = users.get(userId);
       }
       user.update(this.kinect);
-      this.drawBaseRectangle(this.getBaseRectangle);
+      this.drawBaseRectangle(user);
     }
   } 
   

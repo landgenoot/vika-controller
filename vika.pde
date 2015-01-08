@@ -25,6 +25,8 @@ Controller controller;
 void setup()
 {
   controller = Controller.getInstance();
+  SingletonSerial.createInstance(this, 0);
+  
   
   Segment[] segments = {
     new Segment(0, new SimpleOpenNI(0, this),

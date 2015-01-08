@@ -23,7 +23,7 @@ class Rectangle
    */
   public boolean isInside(Point p)
   {
-    if (origin.x > p.x || origin.y > p.y || origin.x+width < p.x || origin.y+heigth < p.y) {
+    if (origin.x > p.x || origin.y > p.y || origin.x+width < p.x || origin.y+height < p.y) {
       return false; 
     } else {
       return true;

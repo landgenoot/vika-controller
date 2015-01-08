@@ -12,18 +12,15 @@ static class SingletonSerial
   
   private SingletonSerial() {}
   
-  private synchronized static void createInstance()
+  public synchronized static void createInstance(vika main, int port)
   {
     if (_instance == null) {
-      String portName = Serial.list()[4]; //change the 0 to a 1 or 2 etc. to match your port
-      _instance = new Serial(this, portName, 9600);
+      String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
+      _instance = new Serial(main, portName, 9600);
     }
   }
   
   public static Serial getInstance () {
-    if (_instance == null) {
-      createInstance ();
-    }
     return _instance;
   }
 }
