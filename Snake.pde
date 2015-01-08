@@ -1,4 +1,8 @@
 
+/**
+ * Beunprojectje
+ */
+
 class Snake
 {
   
@@ -7,6 +11,8 @@ class Snake
   Controller controller;
   ArrayList<Flap> tail = new ArrayList<Flap>();
   int tailSize = 1;
+  int effect = 0;
+  boolean gameOver = false;
   
   public Snake()
   {
@@ -18,39 +24,55 @@ class Snake
   
   public void update()
   {
-    if (food != null) {
-      food.speed(1);
-    }
-    delay(500);
-    currentFlap = this.getNextFlap();
-    if (currentFlap == null) {
+    if (gameOver) {
       this.gameOver();
     } else {
-      if (currentFlap.location.equals(food.location)) {
-        tailSize++;
-        food = controller.flaps[int(random(77))];
+      if (food != null) {
+        food.speed(1);
       }
-        
-      tail.add(currentFlap);
-      this.drawTail();
-      if (tail.size() > tailSize){
-        tail.remove(0);
+      delay(500);
+      currentFlap = this.getNextFlap();
+      if (currentFlap == null) {
+        gameOver = true;
+        effect = 0;
+      } else {
+        if (currentFlap.location.equals(food.location)) {
+          tailSize++;
+          food = controller.flaps[int(random(77))];
+        }
+          
+        tail.add(currentFlap);
+        this.drawTail();
+        if (tail.size() > tailSize){
+          tail.remove(0);
+        }
       }
     }
   }
   
   private void gameOver()
   {
-    for (int i = 0; i < 300; i++) {
-      controller.
-      controller.drawRectangle(
-        new Rectangle(
-          new Point(0,x),
-          70,
-          220
-        ),
-        1
-      );
+    controller.enableFade = true;
+    controller.drawRectangle(
+      new Rectangle(
+        new Point(effect, 0),
+        50,
+        400
+      ),
+      1
+    );
+    effect += 10;
+  
+    if (effect > 600) {
+      controller.enableFade = false;
+      gameOver = false;
+      tail = new ArrayList<Flap>();
+      controller = Controller.getInstance();
+      currentFlap = controller.flaps[30];
+      food = controller.flaps[int(random(77))];
+      food.speed(1);
+      direction = 0;
+      tailSize = 1;
     }
   }
   
