@@ -36,7 +36,7 @@ class Flap
   {
     if (this.speed != 0.0) {
       // Turn of motor is speed drops below 0.1
-      this.speed = this.speed*0.90 > 0.03 ? this.speed*0.95 : 0.0;
+      this.speed = this.speed*0.80 > 0.03 ? this.speed*0.8 : 0.0;
       this.update();
     }
   }

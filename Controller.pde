@@ -16,6 +16,7 @@ static class Controller
   SafetyMechanism safetyMechanism;
   Simulation simulation;
   boolean halt = false;
+  public boolean enableFade = false;
    
   private Controller()
   {
@@ -73,8 +74,22 @@ static class Controller
   private void fadeOutAll()
   {
     for (Flap flap : flaps) {
-      flap.fadeOut();
+      
+      if (enableFade) {
+        flap.fadeOut();
+      } else {
+        flap.speed(0);
+      }
     }
+  }
+  
+  public Flap findFlapByLocation(Point point) {
+    for (Flap flap : this.flaps) {
+      if (flap.location.equals(point)) {
+        return flap;
+      }
+    }
+    return null;
   }
  
   public void registerFlaps(Flap flaps[]) { this.flaps = flaps; }

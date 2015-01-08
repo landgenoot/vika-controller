@@ -23,6 +23,7 @@ O --> x
 
 Controller controller;
 Simulation simulation;
+Snake snake;
 
 int x = 0;
 void setup()
@@ -133,25 +134,33 @@ void setup()
   controller.registerSegments(segments);
   controller.registerFlaps(flaps);
   //controller.registerSafetyMechanism(safetyMechanism);
+  snake = new Snake();
 }
 
 void draw()
 {
-  //controller.flaps[int(random(77))].speed(1);
+  
+  
+  snake.update();
   simulation.update();
   controller.update(); 
+  
   delay(10);
   
-  
-  controller.drawRectangle(
-    new Rectangle(
-      new Point(0,x),
-      320,
-      20
-    ),
-    1
-  );
-  x = x+5;
+//  
+//  controller.drawRectangle(
+//    new Rectangle(
+//      new Point(x,0),
+//      70,
+//      220
+//    ),
+//    1
+//  );
+//  x++;
+}
+
+void keyPressed() {
+  snake.setNextDirection();
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)

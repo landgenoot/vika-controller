@@ -17,6 +17,15 @@ class Point
     this.y = y;
   }
   
+  public boolean equals(Point that)
+  {
+    if (this.x == that.x && this.y == that.y) {
+      return true;
+    } else {
+      return false;
+    } 
+  }
+  
   public String toString()
   {
     return "Point(" + x + ", " + y + ")";
