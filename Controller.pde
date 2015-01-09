@@ -16,6 +16,7 @@ static class Controller
   SafetyMechanism safetyMechanism;
   Simulation simulation;
   boolean halt = false;
+  boolean fade = false;
    
   private Controller()
   {
@@ -44,6 +45,25 @@ static class Controller
       }
     }  
   }
+  
+  public PGraphics drawText(String text, PGraphics pg, PFont font, int x)
+  {
+    pg.beginDraw();
+    pg.smooth();
+    pg.background(0);
+    pg.fill(255);
+    pg.textFont(font, 250);
+    pg.text(text, x, 230);
+    pg.endDraw();
+    
+    for (Flap flap : flaps) {
+      if (pg.get(flap.location.x, pg.height-flap.location.y) == -1) {
+        flap.speed(1);
+      }
+    }
+    return pg;
+  }
+    
  
  public void update()
   {
@@ -73,7 +93,11 @@ static class Controller
   private void fadeOutAll()
   {
     for (Flap flap : flaps) {
-      flap.fadeOut();
+      if (fade) {
+        flap.fadeOut();
+      } else {
+        flap.speed(0);
+      }
     }
   }
  

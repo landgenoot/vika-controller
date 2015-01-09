@@ -35,6 +35,7 @@ class Simulation
     for (Segment segment : controller.segments) {
       drawSegment(segment);
     }
+    smooth(); 
   }
   
   private void drawFlap(Flap flap, float speed) 

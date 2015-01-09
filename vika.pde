@@ -45,7 +45,6 @@ void setup()
   size(640 + 640*segments.length, 480);
   stroke(0,0,255);
   strokeWeight(3);
-  smooth(); 
   
   Flap[] flaps = { 
     new Flap(0,  new Point(15, 20 + (30*6))),
@@ -138,20 +137,12 @@ void setup()
 void draw()
 {
   //controller.flaps[int(random(77))].speed(1);
+  
   simulation.update();
   controller.update(); 
-  delay(10);
-  
-  
-  controller.drawRectangle(
-    new Rectangle(
-      new Point(0,x),
-      320,
-      20
-    ),
-    1
-  );
-  x = x+5;
+  controller.drawText("  VIKA", createGraphics(290, 300), createFont("Arial Black", 50), x);
+  x -= 27;
+  delay(300);
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)
