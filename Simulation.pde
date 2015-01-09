@@ -67,8 +67,10 @@ class Simulation
   {
     Rectangle rect = segment.controllingArea; 
     pushMatrix();
+    scale(-1, 1);
+    
     PImage image = segment.kinect.userImage();
-    image(image, this.x+(rect.origin.x)*scale, this.y+10, segment.controllingArea.width*scale, 120*0.75*scale);
+    image(image, (this.x+(rect.origin.x)*scale)*-1, this.y+10, segment.controllingArea.width*scale*-1, 120*0.75*scale);
     popMatrix();
   }
   
