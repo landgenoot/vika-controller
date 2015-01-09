@@ -13,6 +13,7 @@ static class Controller
   
   public Flap[] flaps;
   public Segment[] segments;
+  public PGraphics canvas;
   SafetyMechanism safetyMechanism;
   Simulation simulation;
   boolean halt = false;
@@ -47,6 +48,7 @@ static class Controller
  
  public void update()
   {
+    canvas = new PGraphics();
     if (this.safetyMechanism != null && this.safetyMechanism.isHalt()) {
       haltAll();
     } else {

@@ -28,21 +28,35 @@ int x = 0;
 void setup()
 {
   controller = Controller.getInstance();
-  simulation = new Simulation(75, 475, 1.5);
+  simulation = new Simulation(75, 525, 1.5);
   
   //SingletonSerial.createInstance(this, 0);
   
   Segment[] segments = {
-//    new Segment(0, new SimpleOpenNI(0, this),
-//      new Rectangle(
-//        new Point(0, 0),
-//        110, 
-//        210
-//      ),
-//      new Point(40, 140))
+    new Segment(0, new SimpleOpenNI(0, this),
+      new Rectangle(
+        new Point(0, 0),
+        123, 
+        280
+      ),
+      new Point(40, 140)),
+    new Segment(1, new SimpleOpenNI(0, this),
+      new Rectangle(
+        new Point(123, 0),
+        108, 
+        280
+      ),
+      new Point(40, 140)),
+    new Segment(3, new SimpleOpenNI(0, this),
+      new Rectangle(
+        new Point(231, 0),
+        97, 
+        280
+      ),
+      new Point(40, 140))
   };
   
-  size(640 + 640*segments.length, 480);
+  size(640, 750);
   stroke(0,0,255);
   strokeWeight(3);
   smooth(); 

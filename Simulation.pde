@@ -25,24 +25,26 @@ class Simulation
     background(50,50,50);
     pushMatrix();
     textSize(26);
-    text("Vika controller", 110, 40);
+    fill(255);
+    text("Vika controller", 120, 60);
     Controller controller = Controller.getInstance();
     popMatrix();
     strokeWeight(1);
     for (Flap flap : controller.flaps) {
-      drawFlap(flap, flap.speed);
+      drawFlap(flap);
     }
     for (Segment segment : controller.segments) {
       drawSegment(segment);
+      drawKinect(segment);
     }
   }
   
-  private void drawFlap(Flap flap, float speed) 
+  private void drawFlap(Flap flap) 
   {
     pushMatrix();
     translate(this.x+flap.location.x*scale, this.y-flap.location.y*scale);
     strokeWeight(1);
-    fill(140 - speed*140);
+    fill(140 - flap.speed*140);
     polygon(0, 0, 15*scale, 6); 
     fill(255);
     textSize(10*scale);
@@ -56,8 +58,17 @@ class Simulation
     pushMatrix();
     Rectangle rect = segment.controllingArea;
     fill(120, 128);
-    translate(this.x+rect.origin.x, this.y-rect.origin.y-rect.height);
-    rect(0, 0, rect.width, rect.height);
+    translate(this.x+rect.origin.x*scale, this.y-rect.origin.y-rect.height*scale);
+    rect(0, 0, rect.width*scale, rect.height*scale);
+    popMatrix();
+  }
+
+  private void drawKinect(Segment segment)
+  {
+    Rectangle rect = segment.controllingArea; 
+    pushMatrix();
+    PImage image = segment.kinect.userImage();
+    image(image, this.x+(rect.origin.x)*scale, this.y+10, segment.controllingArea.width*scale, 120*0.75*scale);
     popMatrix();
   }
   

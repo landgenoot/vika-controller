@@ -43,7 +43,6 @@ class Segment
   public void update()
   {
     kinect.update();
-    image(kinect.userImage(), 640+640*id, 0);
     int[] userList = kinect.getUsers();
     
     User user;
@@ -61,19 +60,20 @@ class Segment
   {
     Controller controller = Controller.getInstance();
     
-    int projectionHeight = int(min(1.0, 1.2-user.getHeight()) * this.controllingArea.height);
-    int verticalProjectionPosition = int(user.getVerticalPosition() * this.controllingArea.width);
+    int projectionHeight = int(min(1.0, (1.2-(user.getHeight()/200))) * this.controllingArea.height);
+    int verticalProjectionPosition = int(user.getVerticalPosition() * this.controllingArea.width * -0.75);
     
     Rectangle userProjection = new Rectangle(
       new Point(verticalProjectionPosition, 0),
-      50,
+      70,
       projectionHeight
     );
     
-    controller.drawRectangle(userProjection, 1);
+    
     if (user.isActive()) {
-      //println(userProjection.toString());
-      println(user.getHeight());
+      println(userProjection.toString());
+      controller.drawRectangle(userProjection, 1);
+      //println(user.getHeight());
     }
     
   }
