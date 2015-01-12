@@ -32,27 +32,27 @@ void setup()
   //SingletonSerial.createInstance(this, 0);
   
   Segment[] segments = {
-    new Segment(0, new SimpleOpenNI(0, this),
-      new Rectangle(
-        new Point(0, 0),
-        123, 
-        280
-      ),
-      new Point(40, 140)),
-    new Segment(1, new SimpleOpenNI(0, this),
-      new Rectangle(
-        new Point(123, 0),
-        108, 
-        280
-      ),
-      new Point(40, 140)),
-    new Segment(3, new SimpleOpenNI(0, this),
-      new Rectangle(
-        new Point(231, 0),
-        97, 
-        280
-      ),
-      new Point(40, 140))
+//    new Segment(0, new SimpleOpenNI(0, this),
+//      new Rectangle(
+//        new Point(0, 0),
+//        123, 
+//        280
+//      ),
+//      new Point(40, 140)),
+//    new Segment(1, new SimpleOpenNI(0, this),
+//      new Rectangle(
+//        new Point(123, 0),
+//        108, 
+//        280
+//      ),
+//      new Point(40, 140)),
+//    new Segment(3, new SimpleOpenNI(0, this),
+//      new Rectangle(
+//        new Point(231, 0),
+//        97, 
+//        280
+//      ),
+//      new Point(40, 140))
   };
   
   size(640, 750);
@@ -153,27 +153,27 @@ void draw()
 {
   simulation.update();
   controller.update(); 
-  controller.jumpEffect(300);
-  delay(10);
-  
-//  controller.drawLine(
-//    new Line(
-//      new Point(0, 0),
-//      new Point(100, 100),
-//      30
-//    )
-//  );
-  
-//  
+//  controller.jumpEffect(300);
 //  controller.drawRectangle(
 //    new Rectangle(
-//      new Point(0,x),
-//      320,
-//      20
+//      new Point(0, 0),
+//      100,
+//      100
 //    ),
 //    1
 //  );
-//  x = x+5;
+  
+  controller.drawLine(
+    new Line(
+      new Point(0, 0),
+      new Point(100, x+1),
+      30
+    )
+  );
+  x++;
+  
+  
+  delay(50);
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)

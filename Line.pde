@@ -34,9 +34,9 @@ class Line
   public boolean isOnLine(Point p)
   {
     float Alp = atan(slope());
-    float distance = dX(p) * sin(Alp);
-    //println(dX(p));
-    println(Alp);
+    float dX = abs(dX(p) - p.y*(1/slope()));
+//    println(dX);
+    float distance = dX * sin(Alp);
     return (distance < this.thickness);
   }
   

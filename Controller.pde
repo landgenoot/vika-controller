@@ -41,7 +41,6 @@ static class Controller
     }  
   }
  
- 
   /**
    * Draws a line over the installation, from point to point.
    * @param Point a
@@ -51,6 +50,7 @@ static class Controller
   public void drawLine(Line line)
   {
      for (Flap flap : flaps) {
+       
        if (line.isOnLine(flap.location)) {
          flap.speed(1);
        }
