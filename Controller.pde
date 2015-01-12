@@ -13,9 +13,9 @@ static class Controller
   
   public Flap[] flaps;
   public Segment[] segments;
-  public PGraphics canvas;
   SafetyMechanism safetyMechanism;
   Simulation simulation;
+  public int width, height;
   boolean halt = false;
    
   private Controller()
@@ -23,15 +23,10 @@ static class Controller
     SimpleOpenNI.start();
   }
  
-  public void init()
+  public void init(int width, int height)
   {
-    int i = 0;
-    for (Segment segment : segments) {
-      if (segment.init() == false) {
-        println("Can't init segment #" + i);
-      } 
-      i++;
-    }
+    this.width = width;
+    this.height = height;
     if (this.safetyMechanism != null) {
       safetyMechanism.init();
     }
@@ -46,9 +41,24 @@ static class Controller
     }  
   }
  
- public void update()
+ 
+  /**
+   * Draws a line over the installation, from point to point.
+   * @param Point a
+   * @param Point b
+   * @param int thickness (in CM)
+   */
+  public void drawLine(Line line)
   {
-    canvas = new PGraphics();
+     for (Flap flap : flaps) {
+       if (line.isOnLine(flap.location)) {
+         flap.speed(1);
+       }
+     }
+  }
+ 
+  public void update()
+  {
     if (this.safetyMechanism != null && this.safetyMechanism.isHalt()) {
       haltAll();
     } else {
@@ -78,6 +88,24 @@ static class Controller
       flap.fadeOut();
     }
   }
+  
+//  public void jumpEffect(int duration) {
+//    int delay = (duration/this.height);
+//    for (int i = 0; i < this.height; i++) {
+//      this.drawRectangle(
+//        new Rectangle(
+//          new Point(0, i),
+//          this.height/6,
+//          this.width
+//        ),
+//        1
+//      );
+//      try {
+//        Thread.sleep(delay); // Delay doesn't work in a static class
+//      } catch (InterruptedException e) {}
+//        
+//    }
+//  }
  
   public void registerFlaps(Flap flaps[]) { this.flaps = flaps; }
  

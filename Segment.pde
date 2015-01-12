@@ -52,9 +52,24 @@ class Segment
       }
       user = users.get(userId);
       user.update(this.kinect);
-      this.drawBaseRectangle(user);
+      if (user.isActive()) {
+        this.drawBaseRectangle(user);
+      }
     }
   } 
+  
+  private void drawArms(User user)
+  {
+    Controller controller = Controller.getInstance();
+    
+    controller.drawLine(
+      new Line(
+        new Point(0,0), 
+        new Point(100,100),
+        30
+      )
+    );
+  }
   
   private void drawBaseRectangle(User user)
   {
@@ -64,17 +79,11 @@ class Segment
     int verticalProjectionPosition = int(user.getVerticalPosition() * this.controllingArea.width * -0.75);
     
     Rectangle userProjection = new Rectangle(
-      new Point(verticalProjectionPosition, 0),
+      new Point(verticalProjectionPosition+this.controllingArea.origin.x, 0),
       70,
       projectionHeight
     );
     
-    
-    if (user.isActive()) {
-      println(userProjection.toString());
-      controller.drawRectangle(userProjection, 1);
-      //println(user.getHeight());
-    }
-    
+    controller.drawRectangle(userProjection, 1);
   }
 }

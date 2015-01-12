@@ -1,13 +1,12 @@
 
 import SimpleOpenNI.*;
 import processing.serial.*;
-import javax.swing.*; 
 
 /**
  * Master computer for controlling an interactive environment 
  * using multiple Microsoft Kinects.
  
- Coordinate system in CM:
+ Coordinate system Vika in CM:
  
    ----------------------------
    |                          |
@@ -147,25 +146,34 @@ void setup()
   controller.registerSegments(segments);
   controller.registerFlaps(flaps);
   //controller.registerSafetyMechanism(safetyMechanism);
+  controller.init(330, 280);
 }
 
 void draw()
 {
-  //controller.flaps[int(random(77))].speed(1);
   simulation.update();
   controller.update(); 
+  controller.jumpEffect(300);
   delay(10);
   
+//  controller.drawLine(
+//    new Line(
+//      new Point(0, 0),
+//      new Point(100, 100),
+//      30
+//    )
+//  );
   
-  controller.drawRectangle(
-    new Rectangle(
-      new Point(0,x),
-      320,
-      20
-    ),
-    1
-  );
-  x = x+5;
+//  
+//  controller.drawRectangle(
+//    new Rectangle(
+//      new Point(0,x),
+//      320,
+//      20
+//    ),
+//    1
+//  );
+//  x = x+5;
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)
