@@ -13,8 +13,9 @@ static class Controller
   
   public Flap[] flaps;
   public Segment[] segments;
-  SafetyMechanism safetyMechanism;
-  Simulation simulation;
+  public SafetyMechanism safetyMechanism;
+  public Effect effect;
+  public Simulation simulation;
   public int width, height;
   boolean halt = false;
    
@@ -67,6 +68,7 @@ static class Controller
         segment.update();
       }
     }
+    effect.update();
   }
   
   /**
@@ -110,9 +112,13 @@ static class Controller
   public void registerFlaps(Flap flaps[]) { this.flaps = flaps; }
  
   public void registerSegments(Segment segments[]) { this.segments = segments; }
+  
+  public void registerEffect(Effect effect) { this.effect = effect; }
+  
+  public void registerSimulation(Simulation simulation) { this.simulation = simulation; }
  
   public void registerSafetyMechanism(SafetyMechanism safetyMechanism) { this.safetyMechanism = safetyMechanism; }
-
+  
   private static void createInstance()
   {
     if (_instance == null) {

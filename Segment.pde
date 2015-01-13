@@ -54,18 +54,41 @@ class Segment
       user.update(this.kinect);
       if (user.isActive()) {
         this.drawBaseRectangle(user);
+        this.drawArms(user);
+        this.checkJump(user);
       }
     }
   } 
+  
+  private void checkJump(User user)
+  {
+    Controller controller = Controller.getInstance();
+    
+    if (user.rightFoot.y > -950 && controller.effect.type == 0) {
+      controller.effect.bottomToTop();
+    }
+  }
   
   private void drawArms(User user)
   {
     Controller controller = Controller.getInstance();
     
+    int projectionHeight = int(min(1.0, (1.2-(user.getHeight()/200))) * this.controllingArea.height);
+    int verticalProjectionPosition = int(user.getVerticalPosition() * this.controllingArea.width * -0.75);
+    Point rightArm = user.getRightHand();
+    Point leftArm = user.getLeftHand();
+    
     controller.drawLine(
       new Line(
-        new Point(0,0), 
-        new Point(100,100),
+        new Point(verticalProjectionPosition+this.controllingArea.origin.x+35,projectionHeight), 
+        new Point(verticalProjectionPosition+this.controllingArea.origin.x+rightArm.x*2,projectionHeight + rightArm.y*3),
+        30
+      )
+    );
+    controller.drawLine(
+      new Line(
+        new Point(verticalProjectionPosition+this.controllingArea.origin.x+35,projectionHeight), 
+        new Point(verticalProjectionPosition+this.controllingArea.origin.x+leftArm.x*2,projectionHeight + leftArm.y*3),
         30
       )
     );

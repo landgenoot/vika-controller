@@ -32,13 +32,13 @@ void setup()
   //SingletonSerial.createInstance(this, 0);
   
   Segment[] segments = {
-//    new Segment(0, new SimpleOpenNI(0, this),
-//      new Rectangle(
-//        new Point(0, 0),
-//        123, 
-//        280
-//      ),
-//      new Point(40, 140)),
+    new Segment(0, new SimpleOpenNI(0, this),
+      new Rectangle(
+        new Point(0, 0),
+        123, 
+        280
+      ),
+      new Point(40, 140)),
 //    new Segment(1, new SimpleOpenNI(0, this),
 //      new Rectangle(
 //        new Point(123, 0),
@@ -141,10 +141,14 @@ void setup()
     new Flap(77, new Point(15 + (27*11), 35 + (30*1))),
   };
   
+  Effect effect = new Effect();
+  
   //SafetyMechanism safetyMechanism = new SafetyMechanism(new SimpleOpenNI(0, this));
   
   controller.registerSegments(segments);
   controller.registerFlaps(flaps);
+  controller.registerEffect(effect);
+  controller.registerSimulation(simulation);
   //controller.registerSafetyMechanism(safetyMechanism);
   controller.init(330, 280);
 }
@@ -153,27 +157,6 @@ void draw()
 {
   simulation.update();
   controller.update(); 
-//  controller.jumpEffect(300);
-//  controller.drawRectangle(
-//    new Rectangle(
-//      new Point(0, 0),
-//      100,
-//      100
-//    ),
-//    1
-//  );
-  
-  controller.drawLine(
-    new Line(
-      new Point(200, 200),
-      new Point(250, x),
-      25  
-    )
-  );
-  x++;
-  
-  
-  delay(10);
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)

@@ -10,7 +10,7 @@
 class User
 {
   public int id;
-  private int stopcount;
+  private int stopcount = 5;
   public PVector leftHand = new PVector();
   public PVector leftShoulder = new PVector();
   public PVector rightHand = new PVector();
@@ -44,6 +44,20 @@ class User
   public float getVerticalPosition()
   {
     return head.x/1000;
+  }
+  
+  public Point getRightHand()
+  {
+    int dx = int(leftShoulder.x/10 - leftHand.x/10);
+    int dy = int(leftHand.y/10 - leftShoulder.y/10);
+    return new Point(dx, dy);
+  }
+  
+  public Point getLeftHand()
+  {
+    int dx = int(rightShoulder.x/10 - rightHand.x/10);
+    int dy = int(rightHand.y/10 - rightShoulder.y/10);
+    return new Point(dx, dy);
   }
   
   public void updateStopcount()
