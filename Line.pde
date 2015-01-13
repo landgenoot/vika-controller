@@ -1,4 +1,6 @@
 
+import java.awt.geom.Line2D.Double;
+
 /**
  * Line from point to point over the installation.
  * 
@@ -20,38 +22,55 @@ class Line
   
   /**
    * Returns true if the given point is part of the line.
-   
-        . b
-       / \
-      /   \
-     /     \
-   ./Alp____\. point
-   a   
-   
    * @param Point
    * @return boolean true if part of line
    */
   public boolean isOnLine(Point p)
   {
-    float Alp = atan(slope());
-    float dX = abs(dX(p) - p.y*(1/slope()));
-//    println(dX);
-    float distance = dX * sin(Alp);
-    return (distance < this.thickness);
+    if (
+      b.y > a.y 
+      && (
+        p.y > b.y+thickness 
+        || p.y < a.y-thickness
+      ) 
+      || a.y >= b.y 
+      && (
+        p.y > a.y+thickness 
+        || p.y < b.y-thickness 
+      )
+      || b.x > a.x 
+      && (
+        p.x > b.x+thickness 
+        || p.x < a.x-thickness
+      ) 
+      || a.x >= b.x 
+      && (
+        p.x > a.x+thickness 
+        || p.x < b.x-thickness 
+      )
+    ) {
+      return false;
+    }
+    float x1 = a.x;
+    float x2 = b.x;
+    float y1 = a.y;
+    float y2 = b.y;
+    float px = p.x;
+    float py = p.y;
+    float x, y;
+    
+    float pd2 = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+    if (pd2 == 0) {
+      x = x1;
+      y = y2;
+    } else {
+      float u = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / pd2;
+      x = x1 + u * (x2 - x1);
+      y = y1 + u * (y2 - y1);
+    }
+    double distance = Math.sqrt((x - px) * (x - px) + (y - py) * (y - py));
+    
+    return (distance < thickness);
   }
   
-  public int dX(Point p)
-  {
-    return abs(p.x - a.x); 
-  }
-  
-  public int dY(Point p)
-  {
-    return abs(p.y - a.y);
-  }
-  
-  public float slope()
-  {
-    return dX(b)/dY(b);
-  }
 }

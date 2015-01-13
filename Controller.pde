@@ -51,7 +51,7 @@ static class Controller
   {
      for (Flap flap : flaps) {
        
-       if (line.isOnLine(flap.location)) {
+       if ( line.isOnLine(flap.location)) {
          flap.speed(1);
        }
      }

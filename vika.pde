@@ -165,15 +165,15 @@ void draw()
   
   controller.drawLine(
     new Line(
-      new Point(0, 0),
-      new Point(100, x+1),
-      30
+      new Point(200, 200),
+      new Point(250, x),
+      25  
     )
   );
   x++;
   
   
-  delay(50);
+  delay(10);
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)
