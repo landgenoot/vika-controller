@@ -32,7 +32,7 @@ void setup()
   //SingletonSerial.createInstance(this, 0);
   
   Serial[] serialInstances = {
-    
+    new Serial(this, Serial.list()[0], 9600)
   };
   
   Message message = new Message(serialInstances);
@@ -164,6 +164,10 @@ void draw()
 {
   simulation.update();
   controller.update(); 
+  controller.flaps[1].speed(1);
+  delay(100);
+  controller.flaps[1].fadeOut();
+  delay(100);
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)

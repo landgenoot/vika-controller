@@ -30,8 +30,11 @@ class Flap
     if (speed == 1.0) {
       lastOnTimestamp = millis();
     }
+    float previousSpeed = this.speed;
     this.speed = speed;
-    this.update();
+    if (previousSpeed != speed) {
+      this.update();
+    }
   }
   
   /**
@@ -42,17 +45,16 @@ class Flap
   {
     if (this.speed != 0.0) {
       int timePassed = millis()-lastOnTimestamp;
-      float newSpeed = 1000/(timePassed*5);
+      float newSpeed = 100.0/(timePassed);
       newSpeed = newSpeed > 1.0 ? 1 : newSpeed;
       // Turn of motor if speed drops below 0.3
-      this.speed = newSpeed > 0.03 ? newSpeed : 0.0;
-      this.update();
+      this.speed(newSpeed > 0.03 ? newSpeed : 0.0);
     }
   }
   
-  public int getMotorValue()
+  public byte getMotorValue()
   {
-    return int(this.speed*this.speedCorrection*this.maxSpeed);
+    return byte(this.speed*this.speedCorrection*this.maxSpeed);
   }
   
   /**
@@ -65,12 +67,10 @@ class Flap
     
     Byte[] data = new Byte[4];
     
-//    {
-//      77,
-//      this.id,
-//      this.getMotorValue(),
-//      70
-//    }
+    data[0] = 77;
+    data[1] = byte(this.id);
+    data[2] = this.getMotorValue();
+    data[3] = 70;
     
     message.addToQueue(this.bus, data);
   }

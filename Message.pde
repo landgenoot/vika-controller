@@ -3,7 +3,10 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /**
- * Serial wrapper with priority queue implementation
+ * Serial wrapper with priority queue implementation.
+ * Every bus has its own priority queue which makes sure 
+ * that new interactions are always send first on the bus.
+ * Fade-out messages do have a lower priority.
  * 
  * @author Daan Middendorp <github-d@landgenoot.com>
  * @copyright TU Delft 2015
@@ -11,11 +14,25 @@ import java.util.PriorityQueue;
 
 class Message
 {
-  ArrayList<PriorityQueue<Byte[]>> messageQueues;
+  ArrayList<PriorityQueue<Byte[]>> messageQueues = new ArrayList<PriorityQueue<Byte[]>>();
   
   Thread deamon = new Thread(){
     public void run(){
-      System.out.println("Thread Running");
+      Controller controller = Controller.getInstance();
+      while (true) {
+        int bus = 0;
+        for (PriorityQueue<Byte[]> messageQueue : messageQueues) {
+          while (messageQueue.size() > 0) {
+              controller.message.serialInstances[bus].write(
+                toPrimitives(
+                  messageQueue.remove()
+                )
+              );
+          }
+          bus++;
+        }
+        delay(200);
+      }
     }
   };
     
@@ -29,7 +46,7 @@ class Message
         new PriorityQueue<Byte[]>(
           10, new Comparator<Byte[]>() {
             public int compare(Byte[] message1, Byte[] message2) {
-              return (message1[2] == 255 ? 1 : -1);
+              return (message1[2] == 95 ? -1 : 1);
             }
         })
       );
@@ -47,5 +64,16 @@ class Message
   public void addToQueue(int bus, Byte[] data)
   {    
     messageQueues.get(bus).add(data);   
+  }
+  
+  private byte[] toPrimitives(Byte[] oBytes)
+  {
+  
+      byte[] bytes = new byte[oBytes.length];
+      for(int i = 0; i < oBytes.length; i++){
+          bytes[i] = oBytes[i];
+      }
+      return bytes;
+  
   }
 }
