@@ -11,34 +11,48 @@
 class Flap
 {
   public int id;
+  public int bus;
   private int maxSpeed = 127;
-  private float speed;
-  private float speedCorrection = 0.75;
+  public float speed;
+  public float speedCorrection = 0.75;
+  public int lastOnTimestamp; // For fade-out purposes
   public Point location;
   
-  public Flap(int id, Point location)
+  public Flap(int id, int bus, Point location)
   {
     this.id = id;
+    this.bus = bus;
     this.location = location;
   }
   
   public void speed(float speed)
   {
+    if (speed == 1.0) {
+      lastOnTimestamp = millis();
+    }
     this.speed = speed;
     this.update();
   }
   
   /**
-   * Adjusts the speed to 80% of the current speed, resulting
+   * Adjusts the speed to 90% of the current speed, resulting
    * in a fade-out effect.
    */
   public void fadeOut()
   {
     if (this.speed != 0.0) {
-      // Turn of motor is speed drops below 0.1
-      this.speed = this.speed*0.9 > 0.03 ? this.speed*0.9 : 0.0;
+      int timePassed = millis()-lastOnTimestamp;
+      float newSpeed = 1000/(timePassed*5);
+      newSpeed = newSpeed > 1.0 ? 1 : newSpeed;
+      // Turn of motor if speed drops below 0.3
+      this.speed = newSpeed > 0.03 ? newSpeed : 0.0;
       this.update();
     }
+  }
+  
+  public int getMotorValue()
+  {
+    return int(this.speed*this.speedCorrection*this.maxSpeed);
   }
   
   /**
@@ -46,15 +60,18 @@ class Flap
    */
   private void update()
   {
-    Serial serial = SingletonSerial.getInstance();
-    //Simulation simulation = Simulation.getInstance();
-    if (serial != null) {
-      int value = int(speed*speedCorrection*maxSpeed);
-      
-      serial.write((byte)254); // @note: changed due to interference with speed values
-      serial.write((byte)this.id);
-      serial.write((byte)value);
-      serial.write((byte)255);
-    }
+    Controller controller = Controller.getInstance();
+    Message message = controller.message;
+    
+    Byte[] data = new Byte[4];
+    
+//    {
+//      77,
+//      this.id,
+//      this.getMotorValue(),
+//      70
+//    }
+    
+    message.addToQueue(this.bus, data);
   }
 }

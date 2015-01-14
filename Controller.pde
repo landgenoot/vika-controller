@@ -16,10 +16,12 @@ static class Controller
   public SafetyMechanism safetyMechanism;
   public Effect effect;
   public Simulation simulation;
+  public Message message;
   public int width, height;
-  boolean halt = false;
+  public boolean halt = false;
+  public 
    
-  private Controller()
+  Controller()
   {
     SimpleOpenNI.start();
   }
@@ -118,6 +120,8 @@ static class Controller
   public void registerSimulation(Simulation simulation) { this.simulation = simulation; }
  
   public void registerSafetyMechanism(SafetyMechanism safetyMechanism) { this.safetyMechanism = safetyMechanism; }
+  
+  public void registerMessage(Message message) { this.message = message; }
   
   private static void createInstance()
   {
