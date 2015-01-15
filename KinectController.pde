@@ -10,16 +10,14 @@
  
 public class KinectController extends Thread
 {
-  public int segmentId;
   public SimpleOpenNI kinect;
-  public Segment segment;
   Map<Integer, User> users = new HashMap<Integer, User>();
+  int[] userList;
+  PImage image;
   
-  public KinectController(int s, int n, int m)
+  public KinectController(SimpleOpenNI kinect)
   {
-    this.segmentId = segmentId;
     this.kinect = kinect;
-    this.segment = segment;
   }
   
   public void run()
@@ -41,12 +39,15 @@ public class KinectController extends Thread
     }
   }
   
-  
-    
+  /**
+   * Sends the SimpleOpenNI data to the users' 
+   * object, so it is able to set it in its own form
+   */
   public void update() 
   {
     kinect.update();
-    int[] userList = kinect.getUsers();
+    
+    userList = kinect.getUsers();
     
     User user;
     for (int userId : userList) {
@@ -57,4 +58,10 @@ public class KinectController extends Thread
       user.update(this.kinect);
     } 
   }
+  
+  public Map<Integer, User> getUsers()  { return this.users; }
+  
+  public int[] getUserList() { return this.userList; }
+  
+  public PImage userImage() { return this.userImage();  }
 }

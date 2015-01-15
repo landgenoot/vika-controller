@@ -14,6 +14,7 @@ class Segment
   int id;
   public Rectangle controllingArea;
   Point kinectLocation;
+  private KinectController kinectController;
   
   /**
    * Constructs a new segment
@@ -22,10 +23,10 @@ class Segment
    */
   public Segment(int id, SimpleOpenNI kinect, Rectangle controllingArea, Point kinectLocation)
   {
-    kinectController.segmentId = id;
-    kinectController.kinect = kinect;
     this.controllingArea = controllingArea;
     this.kinectLocation = kinectLocation;
+    kinectController = new KinectController(kinect);
+    kinectController.start();
   } 
   
   public boolean init()
@@ -39,7 +40,10 @@ class Segment
    */
   public void update()
   {
-    for (int userId : userList) {
+    Map<Integer, User> users = kinectController.getUsers();
+    User user;
+    for (int userId : kinectController.getUserList()) {
+      user = users.get(userId);
       if (user.isActive()) {
         this.drawBaseRectangle(user);
         this.drawArms(user);
