@@ -26,6 +26,11 @@ Simulation simulation;
 int x = 0;
 void setup()
 {
+  size(640, 750);
+  stroke(0,0,255);
+  strokeWeight(3);
+  smooth(); 
+  
   controller = Controller.getInstance();
   simulation = new Simulation(75, 525, 1.5);
   
@@ -60,11 +65,6 @@ void setup()
 //      ),
 //      new Point(40, 140))
   };
-  
-  size(640, 750);
-  stroke(0,0,255);
-  strokeWeight(3);
-  smooth(); 
   
   Flap[] flaps = { 
     new Flap(0,  0, new Point(15, 20 + (30*6))),

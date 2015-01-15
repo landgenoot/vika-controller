@@ -12,8 +12,6 @@ import java.util.Map;
 class Segment
 {
   int id;
-  SimpleOpenNI kinect;
-  Map<Integer, User> users = new HashMap<Integer, User>();
   public Rectangle controllingArea;
   Point kinectLocation;
   
@@ -24,11 +22,10 @@ class Segment
    */
   public Segment(int id, SimpleOpenNI kinect, Rectangle controllingArea, Point kinectLocation)
   {
-    this.kinect = kinect;
+    kinectController.segmentId = id;
+    kinectController.kinect = kinect;
     this.controllingArea = controllingArea;
     this.kinectLocation = kinectLocation;
-    this.kinect.enableDepth();
-    this.kinect.enableUser();
   } 
   
   public boolean init()
@@ -42,16 +39,7 @@ class Segment
    */
   public void update()
   {
-    kinect.update();
-    int[] userList = kinect.getUsers();
-    
-    User user;
     for (int userId : userList) {
-      if (users.get(new Integer(userId)) == null) {
-        users.put(new Integer(userId), new User(userId));
-      }
-      user = users.get(userId);
-      user.update(this.kinect);
       if (user.isActive()) {
         this.drawBaseRectangle(user);
         this.drawArms(user);

@@ -23,15 +23,17 @@ class Message
         int bus = 0;
         for (PriorityQueue<Byte[]> messageQueue : messageQueues) {
           while (messageQueue.size() > 0) {
-              controller.message.serialInstances[bus].write(
-                toPrimitives(
-                  messageQueue.remove()
-                )
-              );
+            controller.message.serialInstances[bus].write(
+              toPrimitives(
+                messageQueue.remove()
+              )
+            );
           }
-          bus++;
+          bus++; 
         }
-        delay(200);
+        try {
+          Thread.sleep(200);
+        } catch (InterruptedException e) {}
       }
     }
   };
