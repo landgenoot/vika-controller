@@ -12,7 +12,7 @@ public class KinectController extends Thread
 {
   public SimpleOpenNI kinect;
   Map<Integer, User> users = new HashMap<Integer, User>();
-  int[] userList;
+  int[] userList = {};
   PImage userImage;
   
   public KinectController(SimpleOpenNI kinect)
@@ -22,13 +22,15 @@ public class KinectController extends Thread
   
   public void run()
   {
+    
+    println("a");
     kinect.enableDepth();
     kinect.enableUser();
     
     int startLoop = 0;
     while (true) {
       startLoop = millis();
-      
+      println("b");
       this.update();
       
       // Run at 15fps
@@ -47,6 +49,7 @@ public class KinectController extends Thread
   {
     kinect.update();
     userImage = kinect.userImage();
+    println(1);
     image(userImage, 0, 0);
     userList = kinect.getUsers();
     
