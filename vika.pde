@@ -50,13 +50,13 @@ void setup()
         280
       ),
       new Point(40, 140)),
-//    new Segment(1, new SimpleOpenNI(0, this),
-//      new Rectangle(
-//        new Point(123, 0),
-//        108, 
-//        280
-//      ),
-//      new Point(40, 140)),
+    new Segment(0, new SimpleOpenNI(0, this),
+      new Rectangle(
+        new Point(123, 0),
+        108, 
+        280
+      ),
+      new Point(40, 140)),
 //    new Segment(3, new SimpleOpenNI(0, this),
 //      new Rectangle(
 //        new Point(231, 0),
@@ -162,6 +162,7 @@ void setup()
 
 void draw()
 {
+  println(frameRate);
   simulation.update();
   controller.update(); 
 }

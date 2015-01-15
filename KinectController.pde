@@ -22,15 +22,12 @@ public class KinectController extends Thread
   
   public void run()
   {
-    
-    println("a");
     kinect.enableDepth();
     kinect.enableUser();
     
     int startLoop = 0;
     while (true) {
       startLoop = millis();
-      println("b");
       this.update();
       
       // Run at 15fps
@@ -49,12 +46,9 @@ public class KinectController extends Thread
   {
     kinect.update();
     userImage = kinect.userImage();
-    println(1);
-    image(userImage, 0, 0);
     userList = kinect.getUsers();
     
     User user;
-    println(userList.length);
     for (int userId : userList) {
       if (users.get(new Integer(userId)) == null) {
         users.put(new Integer(userId), new User(userId));
