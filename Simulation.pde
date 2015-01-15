@@ -70,7 +70,9 @@ class Simulation
     scale(-1, 1);
     
     PImage image = segment.kinectController.userImage();
-    image(image, (this.x+(rect.origin.x)*scale)*-1, this.y+10, segment.controllingArea.width*scale*-1, 120*0.75*scale);
+    if (image != null) {
+      image(image, (this.x+(rect.origin.x)*scale)*-1, this.y+10, segment.controllingArea.width*scale*-1, 120*0.75*scale);
+    }
     popMatrix();
   }
   

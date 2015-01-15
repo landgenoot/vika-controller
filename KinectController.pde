@@ -13,7 +13,7 @@ public class KinectController extends Thread
   public SimpleOpenNI kinect;
   Map<Integer, User> users = new HashMap<Integer, User>();
   int[] userList;
-  PImage image;
+  PImage userImage;
   
   public KinectController(SimpleOpenNI kinect)
   {
@@ -46,10 +46,12 @@ public class KinectController extends Thread
   public void update() 
   {
     kinect.update();
-    
+    userImage = kinect.userImage();
+    image(userImage, 0, 0);
     userList = kinect.getUsers();
     
     User user;
+    println(userList.length);
     for (int userId : userList) {
       if (users.get(new Integer(userId)) == null) {
         users.put(new Integer(userId), new User(userId));
@@ -63,5 +65,5 @@ public class KinectController extends Thread
   
   public int[] getUserList() { return this.userList; }
   
-  public PImage userImage() { return this.userImage();  }
+  public PImage userImage() { return this.userImage;  }
 }

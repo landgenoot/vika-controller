@@ -43,13 +43,13 @@ void setup()
   Message message = new Message(serialInstances);
   
   Segment[] segments = {
-//    new Segment(0, new SimpleOpenNI(0, this),
-//      new Rectangle(
-//        new Point(0, 0),
-//        123, 
-//        280
-//      ),
-//      new Point(40, 140)),
+    new Segment(0, new SimpleOpenNI(0, this),
+      new Rectangle(
+        new Point(0, 0),
+        123, 
+        280
+      ),
+      new Point(40, 140)),
 //    new Segment(1, new SimpleOpenNI(0, this),
 //      new Rectangle(
 //        new Point(123, 0),
@@ -164,10 +164,6 @@ void draw()
 {
   simulation.update();
   controller.update(); 
-  controller.flaps[1].speed(1);
-  delay(100);
-  controller.flaps[1].fadeOut();
-  delay(100);
 }
 
 void onNewUser(SimpleOpenNI curcam1, int userId)
