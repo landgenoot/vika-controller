@@ -8,14 +8,52 @@
  * @copyright TU Delft 2015
  */
  
-public class KinectController extends Thread
+ 
+public abstract class KinectController extends Thread
 {
-  public SimpleOpenNI kinect;
   Map<Integer, User> users = new HashMap<Integer, User>();
   int[] userList = {};
+  
+  public Map<Integer, User> getUsers()  { return this.users; }
+  
+  public int[] getUserList() { return this.userList; }
+}
+
+public class RemoteKinectController extends KinectController
+{
+  String address;
+  int port;
+  
+  public RemoteKinectController(String address, int port)
+  {
+    this.address = address;
+    this.port = port;
+  }
+  
+  /**
+   * Connects to the remote server, and keeps 
+   * waiting for new incoming new incoming data on this
+   * thread.
+   */
+  public void run()
+  {
+    client = new Client(this, this.address, this.port);
+    while (true) {
+      if (client.available() > 0) {
+        dataIn = client.read();
+      }
+      
+    }
+  }
+  
+}
+ 
+public class LocalKinectController extends KinectController
+{
+  public SimpleOpenNI kinect;
   PImage userImage;
   
-  public KinectController(SimpleOpenNI kinect)
+  public LocalKinectController(SimpleOpenNI kinect)
   {
     this.kinect = kinect;
   }
@@ -57,10 +95,6 @@ public class KinectController extends Thread
       user.update(this.kinect);
     } 
   }
-  
-  public Map<Integer, User> getUsers()  { return this.users; }
-  
-  public int[] getUserList() { return this.userList; }
   
   public PImage userImage() { return this.userImage;  }
 }

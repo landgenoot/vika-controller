@@ -17,7 +17,7 @@ class Segment
   private KinectController kinectController;
   
   /**
-   * Constructs a new segment
+   * Constructs a new segment with a local kinect
    * @param kinect a SimpleOpenNI instance
    * @param controllingArea is the space which is controlled by this segment.
    */
@@ -25,9 +25,26 @@ class Segment
   {
     this.controllingArea = controllingArea;
     this.kinectLocation = kinectLocation;
-    kinectController = new KinectController(kinect);
+    kinectController = new LocalKinectController(kinect);
     kinectController.start();
   } 
+  
+  
+  /**
+   * Constructs a new segment with a remote kinect
+   * @param String address
+   * @param int port
+   * @param controllingArea is the space which is controlled by this segment.
+   */
+  public Segment(int id, String address, int port, Rectangle controllingArea, Point kinectLocation)
+  {
+    this.controllingArea = controllingArea;
+    this.kinectLocation = kinectLocation;
+    kinectController = new RemoteKinectController(address, port);
+    kinectController.start();
+  } 
+  
+  
   
   public boolean init()
   {

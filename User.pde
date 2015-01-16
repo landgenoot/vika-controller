@@ -33,6 +33,34 @@ class User
     this.updateStopcount();
   }
   
+  public void update(String input)
+  {
+    String[] vars = input.split(",");
+    
+//    this.id = int(vars[0]);
+    this.stopcount = int(vars[1]);
+    this.leftHand.x = float(vars[2])
+    this.leftHand.y = float(vars[3]);
+    this.leftHand.z = float(vars[4]);
+    this.leftShoulder.x = float(vars[5]);
+    this.leftShoulder.y = float(vars[6]);
+    this.leftShoulder.z = float(vars[7]);
+    this.rightHand.x = float(vars[8]);
+    this.rightHand.y = float(vars[9]);
+    this.rightHand.z = float(vars[10]);
+    this.rightShoulder.x = float(vars[11]);
+    this.rightShoulder.y = float(vars[12]);
+    this.rightShoulder.z = float(vars[13]);
+    this.head.x = float(vars[14]);
+    this.head.y = float(vars[15]);
+    this.head.z= float(vars[16]);
+    this.rightFoot.x = float(vars[17]);
+    this.rightFoot.y = float(vars[18]);
+    this.rightFoot.z = float(vars[19]);
+    this.previousHeadX = float(vars[20]);
+    
+  }
+  
   /**
    * Returns length of the user in CM
    */
@@ -118,5 +146,34 @@ class User
       this.rightFoot
     );
   }
+  
+  public String serialize()
+  {
+    String output = "":
+    
+    output = 
+      this.id + "," + 
+      this.stopcount + "," + 
+      this.leftHand.x + "," + 
+      this.leftHand.y + "," + 
+      this.leftHand.z + "," + 
+      this.leftShoulder.x + "," + 
+      this.leftShoulder.y + "," + 
+      this.leftShoulder.z + "," + 
+      this.rightHand.x + "," + 
+      this.rightHand.y + "," + 
+      this.rightHand.z + "," + 
+      this.rightShoulder.x + "," + 
+      this.rightShoulder.y + "," + 
+      this.rightShoulder.z + "," +
+      this.head.x + "," + 
+      this.head.y + "," + 
+      this.head.z + "," +
+      this.rightFoot.x + "," + 
+      this.rightFoot.y + "," + 
+      this.rightFoot.z + "," +
+      this.previousHeadX
+      
+    return output;
+  }
 }
-
