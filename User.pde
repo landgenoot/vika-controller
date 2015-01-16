@@ -18,6 +18,7 @@ class User
   public PVector head = new PVector();
   public PVector rightFoot = new PVector();
   public float previousHeadX;
+  public int lastUpdate;
   
   public User(int id)
   {
@@ -31,12 +32,11 @@ class User
   {
     this.updatePositions(kinect);  
     this.updateStopcount();
+    this.lastUpdate = millis();
   }
   
-  public void update(String input)
-  {
-    String[] vars = input.split(",");
-    
+  public void update(String vars[])
+  { 
 //    this.id = int(vars[0]);
     this.stopcount = int(vars[1]);
     this.leftHand.x = float(vars[2])
@@ -58,7 +58,7 @@ class User
     this.rightFoot.y = float(vars[18]);
     this.rightFoot.z = float(vars[19]);
     this.previousHeadX = float(vars[20]);
-    
+    this.lastUpdate = millis();
   }
   
   /**

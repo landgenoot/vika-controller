@@ -3,6 +3,11 @@
  * This controller is part of a segment, but runs
  * in a different thread, which should make use of the 
  * multithreading capabilities of the computer.
+ *
+ * There are two types of KinectControllers: Remote and Local
+ * Remote KinectControllers act as a client and keep asking for new incoming 
+ * messages.
+ * Local KinectControllers manage the SimpleOpenNI instance by theirself.
  * 
  * @author Daan Middendorp <github-d@landgenoot.com>
  * @copyright TU Delft 2015
@@ -37,15 +42,23 @@ public class RemoteKinectController extends KinectController
    */
   public void run()
   {
+    String data;
+    String vars[];
     client = new Client(this, this.address, this.port);
     while (true) {
       if (client.available() > 0) {
-        dataIn = client.read();
+        data = client.read();
+         vars = data.split(",")[0];
+         int userId = int(vars[0]);
+         
+         if (users.get(new Integer(userId)) == null) {
+            users.put(new Integer(userId), new User(userId));
+         }
+         user = users.get(userId);
+         user.update(vars);
       }
-      
     }
   }
-  
 }
  
 public class LocalKinectController extends KinectController
