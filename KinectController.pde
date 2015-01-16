@@ -1,3 +1,5 @@
+import java.util.Map;
+import processing.net.*; 
 
 /**
  * This controller is part of a segment, but runs
@@ -12,8 +14,7 @@
  * @author Daan Middendorp <github-d@landgenoot.com>
  * @copyright TU Delft 2015
  */
- 
- 
+
 public abstract class KinectController extends Thread
 {
   Map<Integer, User> users = new HashMap<Integer, User>();
@@ -28,6 +29,7 @@ public class RemoteKinectController extends KinectController
 {
   String address;
   int port;
+  Client client;
   
   public RemoteKinectController(String address, int port)
   {
@@ -44,11 +46,12 @@ public class RemoteKinectController extends KinectController
   {
     String data;
     String vars[];
-    client = new Client(this, this.address, this.port);
+    client = new Client(new PApplet(), this.address, this.port);
+    User user;
     while (true) {
       if (client.available() > 0) {
-        data = client.read();
-         vars = data.split(",")[0];
+        data = client.readString();
+         vars = data.split(",");
          int userId = int(vars[0]);
          
          if (users.get(new Integer(userId)) == null) {
@@ -110,4 +113,34 @@ public class LocalKinectController extends KinectController
   }
   
   public PImage userImage() { return this.userImage;  }
+}
+
+/**
+ * This class wraps the local KinectController and sets up 
+ * a server which pushes the changes every frame.
+ */
+class ServerKinectController extends LocalKinectController
+{
+  Server server;
+  
+  public ServerKinectController(SimpleOpenNI kinect, int port)
+  {
+    super(kinect);
+    server = new Server(new PApplet(), port); 
+  }
+  
+  /**
+   * Run the same as local, and send the data
+   * to the Vika controller
+   */
+  public void update()
+  {
+    super.update();
+    User user;
+    for (int userId : userList) {
+      user = users.get(userId);
+      server.write(user.serialize());
+    }
+  }
+  
 }

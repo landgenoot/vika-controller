@@ -39,7 +39,7 @@ class User
   { 
 //    this.id = int(vars[0]);
     this.stopcount = int(vars[1]);
-    this.leftHand.x = float(vars[2])
+    this.leftHand.x = float(vars[2]);
     this.leftHand.y = float(vars[3]);
     this.leftHand.z = float(vars[4]);
     this.leftShoulder.x = float(vars[5]);
@@ -149,7 +149,7 @@ class User
   
   public String serialize()
   {
-    String output = "":
+    String output = "";
     
     output = 
       this.id + "," + 
@@ -172,7 +172,7 @@ class User
       this.rightFoot.x + "," + 
       this.rightFoot.y + "," + 
       this.rightFoot.z + "," +
-      this.previousHeadX
+      this.previousHeadX;
       
     return output;
   }
