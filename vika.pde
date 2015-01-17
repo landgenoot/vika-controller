@@ -22,6 +22,8 @@ O --> x
 
 Controller controller;
 Simulation simulation;
+
+// Slave = kinect host only
 final String mode = "slave";
 
 void setup()
@@ -54,20 +56,20 @@ void setup()
     Message message = new Message(serialInstances);
     
     Segment[] segments = {
-      new Segment(0, new SimpleOpenNI(0, this),
+      new Segment(0, "145.94.151.132", 5555,
         new Rectangle(
           new Point(0, 0),
           123, 
           280
         ),
         new Point(40, 140)),
-      new Segment(0, new SimpleOpenNI(0, this),
-        new Rectangle(
-          new Point(123, 0),
-          108, 
-          280
-        ),
-        new Point(40, 140)),
+//      new Segment(0, new SimpleOpenNI(0, this),
+//        new Rectangle(
+//          new Point(123, 0),
+//          108, 
+//          280
+//        ),
+//        new Point(40, 140)),
   //    new Segment(3, new SimpleOpenNI(0, this),
   //      new Rectangle(
   //        new Point(231, 0),
@@ -175,7 +177,7 @@ void setup()
 void draw()
 {
   if (mode == "master") {
-    println(frameRate);
+   // println(frameRate);
     simulation.update();
     controller.update(); 
   }

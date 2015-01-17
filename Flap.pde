@@ -46,7 +46,7 @@ class Flap
     if (this.speed != 0.0) {
       int timePassed = millis()-lastOnTimestamp;
       float newSpeed = 100.0/(timePassed);
-      newSpeed = newSpeed > 1.0 ? 1 : newSpeed;
+      newSpeed = 0; //newSpeed > 1.0 ? 1 : newSpeed;
       // Turn of motor if speed drops below 0.3
       this.speed(newSpeed > 0.03 ? newSpeed : 0.0);
     }

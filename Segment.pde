@@ -1,5 +1,7 @@
 import java.util.Map;
 
+import java.util.ConcurrentModificationException;
+
 /**
  * A segment is basically a part of the installation controlled by
  * one kinect. This class will read the kinect and determine which
@@ -58,15 +60,15 @@ class Segment
   public void update()
   {
     Map<Integer, User> users = kinectController.getUsers();
-    User user;
-    for (int userId : kinectController.getUserList()) {
-      user = users.get(userId);
-      if (user.isActive()) {
-        this.drawBaseRectangle(user);
-        this.drawArms(user);
-        this.checkJump(user);
+    try {
+      for (User user : users.values()) {
+        if (user.isActive()) {
+          this.drawBaseRectangle(user);
+          this.drawArms(user);
+      //    this.checkJump(user);
+        }
       }
-    }
+    } catch (ConcurrentModificationException e) {}
   } 
   
   private void checkJump(User user)

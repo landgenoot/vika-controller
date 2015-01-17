@@ -45,21 +45,28 @@ public class RemoteKinectController extends KinectController
   public void run()
   {
     String data;
+    String usersData[];
     String vars[];
-    client = new Client(new PApplet(), this.address, this.port);
+    client = new Client(new PApplet(), "145.94.151.132", 5555); 
     User user;
     while (true) {
       if (client.available() > 0) {
+        
         data = client.readString();
-         vars = data.split(",");
-         int userId = int(vars[0]);
-         
-         if (users.get(new Integer(userId)) == null) {
-            users.put(new Integer(userId), new User(userId));
-         }
-         user = users.get(userId);
-         user.update(vars);
+        usersData = data.split(";");
+        for (String userData : usersData) {
+          vars = userData.split(",");
+          int userId = int(vars[0]);
+          
+          if (users.get(new Integer(userId)) == null) {
+             users.put(new Integer(userId), new User(userId));
+          }
+          user = users.get(userId);
+          user.update(vars);
+        }
+        println(users.size());
       }
+      delay(5);
     }
   }
 }
@@ -136,9 +143,12 @@ class ServerKinectController extends LocalKinectController
   public void update()
   {
     super.update();
+    image(kinect.userImage(), 0, 0);
     User user;
     for (int userId : userList) {
       user = users.get(userId);
+      println("write");
+      server.write(1);
       server.write(user.serialize());
     }
   }

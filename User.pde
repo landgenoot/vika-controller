@@ -37,28 +37,30 @@ class User
   
   public void update(String vars[])
   { 
-//    this.id = int(vars[0]);
-    this.stopcount = int(vars[1]);
-    this.leftHand.x = float(vars[2]);
-    this.leftHand.y = float(vars[3]);
-    this.leftHand.z = float(vars[4]);
-    this.leftShoulder.x = float(vars[5]);
-    this.leftShoulder.y = float(vars[6]);
-    this.leftShoulder.z = float(vars[7]);
-    this.rightHand.x = float(vars[8]);
-    this.rightHand.y = float(vars[9]);
-    this.rightHand.z = float(vars[10]);
-    this.rightShoulder.x = float(vars[11]);
-    this.rightShoulder.y = float(vars[12]);
-    this.rightShoulder.z = float(vars[13]);
-    this.head.x = float(vars[14]);
-    this.head.y = float(vars[15]);
-    this.head.z= float(vars[16]);
-    this.rightFoot.x = float(vars[17]);
-    this.rightFoot.y = float(vars[18]);
-    this.rightFoot.z = float(vars[19]);
-    this.previousHeadX = float(vars[20]);
-    this.lastUpdate = millis();
+    if (vars.length == 21) {
+  //    this.id = int(vars[0]);
+      this.stopcount = int(vars[1]);
+      this.leftHand.x = float(vars[2]);
+      this.leftHand.y = float(vars[3]);
+      this.leftHand.z = float(vars[4]);
+      this.leftShoulder.x = float(vars[5]);
+      this.leftShoulder.y = float(vars[6]);
+      this.leftShoulder.z = float(vars[7]);
+      this.rightHand.x = float(vars[8]);
+      this.rightHand.y = float(vars[9]);
+      this.rightHand.z = float(vars[10]);
+      this.rightShoulder.x = float(vars[11]);
+      this.rightShoulder.y = float(vars[12]);
+      this.rightShoulder.z = float(vars[13]);
+      this.head.x = float(vars[14]);
+      this.head.y = float(vars[15]);
+      this.head.z= float(vars[16]);
+      this.rightFoot.x = float(vars[17]);
+      this.rightFoot.y = float(vars[18]);
+      this.rightFoot.z = float(vars[19]);
+      this.previousHeadX = float(vars[20]);
+      this.lastUpdate = millis();
+    }
   }
   
   /**
@@ -103,7 +105,7 @@ class User
    */
   public boolean isActive()
   {
-    return (stopcount > 3 ? false : true);
+    return (stopcount > 3 || millis() - lastUpdate > 1000 ? false : true);
   }
   
   /**

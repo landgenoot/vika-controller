@@ -48,7 +48,7 @@ class Message
         new PriorityQueue<Byte[]>(
           10, new Comparator<Byte[]>() {
             public int compare(Byte[] message1, Byte[] message2) {
-              return (message1[2] == 95 ? -1 : 1);
+              return (message1 != null && message1[2] == 95 ? -1 : 1);
             }
         })
       );
