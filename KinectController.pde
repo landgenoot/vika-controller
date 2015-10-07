@@ -47,7 +47,7 @@ public class RemoteKinectController extends KinectController
     String data;
     String usersData[];
     String vars[];
-    client = new Client(new PApplet(), "145.94.151.132", 5555); 
+    client = new Client(new PApplet(), "192.168.0.2", 5555); 
     User user;
     while (true) {
       if (client.available() > 0) {
@@ -85,6 +85,7 @@ public class LocalKinectController extends KinectController
   {
     kinect.enableDepth();
     kinect.enableUser();
+    kinect.setMirror(true);
     
     int startLoop = 0;
     while (true) {

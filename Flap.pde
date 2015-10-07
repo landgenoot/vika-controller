@@ -12,17 +12,26 @@ class Flap
 {
   public int id;
   public int bus;
-  private int maxSpeed = 127;
+  private int maxSpeed = 37;
   public float speed;
-  public float speedCorrection = 0.75;
+  public float speedCorrection = 1.0;
   public int lastOnTimestamp; // For fade-out purposes
   public Point location;
   
   public Flap(int id, int bus, Point location)
   {
+    this.speedCorrection = (location.y/150.0)+1.0;
     this.id = id;
     this.bus = bus;
     this.location = location;
+  }
+  
+  public Flap(int id, int bus, Point location, float correction)
+  {
+    this.id = id;
+    this.bus = bus;
+    this.location = location;
+    this.speedCorrection = correction;
   }
   
   public void speed(float speed)
@@ -69,7 +78,7 @@ class Flap
     
     data[0] = 77;
     data[1] = byte(this.id);
-    data[2] = this.getMotorValue();
+    data[2] = byte(this.getMotorValue());
     data[3] = 70;
     
     message.addToQueue(this.bus, data);

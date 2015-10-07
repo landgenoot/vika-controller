@@ -24,7 +24,7 @@ Controller controller;
 Simulation simulation;
 
 // Slave = kinect host only
-final String mode = "slave";
+final String mode = "master";
 
 void setup()
 {
@@ -47,36 +47,27 @@ void setup()
     controller = Controller.getInstance();
     simulation = new Simulation(75, 525, 1.5);
     
-    //SingletonSerial.createInstance(this, 0);
-    
     Serial[] serialInstances = {
-      new Serial(this, Serial.list()[0], 9600)
+      new Serial(this, "COM5", 250000)
     };
     
     Message message = new Message(serialInstances);
     
     Segment[] segments = {
-      new Segment(0, "145.94.151.132", 5555,
+      new Segment(0, new SimpleOpenNI(0, this),
         new Rectangle(
-          new Point(0, 0),
-          123, 
-          280
+          new Point(20, 0),
+          108, 
+          380
         ),
         new Point(40, 140)),
-//      new Segment(0, new SimpleOpenNI(0, this),
-//        new Rectangle(
-//          new Point(123, 0),
-//          108, 
-//          280
-//        ),
-//        new Point(40, 140)),
-  //    new Segment(3, new SimpleOpenNI(0, this),
-  //      new Rectangle(
-  //        new Point(231, 0),
-  //        97, 
-  //        280
-  //      ),
-  //      new Point(40, 140))
+      new Segment(1, new SimpleOpenNI(1, this),
+        new Rectangle(
+          new Point(210, 0),
+          108, 
+          380
+        ),
+        new Point(40, 140)),
     };
     
     Flap[] flaps = { 

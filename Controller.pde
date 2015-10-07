@@ -19,7 +19,7 @@ static class Controller
   public Message message;
   public int width, height;
   public boolean halt = false;
-  public 
+  private int  frameCount = 0; 
    
   Controller()
   {
@@ -62,6 +62,31 @@ static class Controller
  
   public void update()
   {
+    frameCount++;
+    if (frameCount % 30 == 0) {
+//      println("reset");
+        byte[] resetAll = {
+          (byte)77,
+          (byte)255,
+          (byte)0,
+          (byte)70
+        };
+        message.serialInstances[0].write(
+          resetAll
+        );
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e) {}
+        message.serialInstances[0].write(
+          resetAll
+        );
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e) {}
+    }
+    if (frameCount % 600 == 0) {
+      this.effect.randomFlap();
+    }
     if (this.safetyMechanism != null && this.safetyMechanism.isHalt()) {
       haltAll();
     } else {

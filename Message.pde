@@ -1,6 +1,7 @@
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.NoSuchElementException;
 
 /**
  * Serial wrapper with priority queue implementation.
@@ -21,13 +22,33 @@ class Message
       Controller controller = Controller.getInstance();
       while (true) {
         int bus = 0;
+        if (controller.message != null) {
+          byte[] resetAll = {
+            (byte)77,
+            (byte)255,
+            (byte)0,
+            (byte)70
+          };
+          controller.message.serialInstances[bus].write(
+            resetAll
+          );
+          delay(1);
+          controller.message.serialInstances[bus].write(
+            resetAll
+          );
+          delay(1);
+        }
         for (PriorityQueue<Byte[]> messageQueue : messageQueues) {
+//          println(messageQueue.size());
           while (messageQueue.size() > 0) {
-            controller.message.serialInstances[bus].write(
-              toPrimitives(
-                messageQueue.remove()
-              )
-            );
+            try {
+              byte[] temp = toPrimitives(messageQueue.remove());
+              controller.message.serialInstances[bus].write(
+                temp
+              );
+              
+              delay(1);
+            } catch (NoSuchElementException e) {}
           }
           bus++; 
         }
@@ -65,7 +86,14 @@ class Message
    */
   public void addToQueue(int bus, Byte[] data)
   {    
-    messageQueues.get(bus).add(data);   
+    byte[] temp = toPrimitives(data);
+    controller.message.serialInstances[bus].write(
+      temp
+    );
+    delay(1);
+    
+    
+//    messageQueues.get(bus).add(data);   
   }
   
   private byte[] toPrimitives(Byte[] oBytes)

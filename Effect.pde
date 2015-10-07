@@ -3,6 +3,8 @@ class Effect
 {
   int progress = 0;
   int type = 0;
+  int random = int(random(0,77));
+  public int lastSeenUser = 0;
   
   public Effect()
   {
@@ -13,6 +15,25 @@ class Effect
   {
     if (type == 1) {
       bottomToTop();
+    } else if (type == 2) {
+      randomFlap();
+    }
+  }
+  
+  public void randomFlap()
+  {
+    if ((millis() - lastSeenUser) < 5000) {
+    type = 2;
+    
+    Controller controller = Controller.getInstance();
+    controller.flaps[random].speed(0.8);
+    progress++;
+    
+    if (progress > 250) {
+      type = 0; 
+      progress = 0;
+      random = int(random(0, 77));
+    }
     }
   }
   
@@ -28,7 +49,7 @@ class Effect
         controller.width,
         100
       ),
-      1
+      2
     );
     controller.simulation.update();
     
@@ -41,3 +62,4 @@ class Effect
   }
   
 }
+

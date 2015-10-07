@@ -73,26 +73,26 @@ class User
   
   public float getVerticalPosition()
   {
-    return head.x/1000;
+    return head.x/1000*-1;
   }
   
   public Point getRightHand()
   {
-    int dx = int(leftShoulder.x/10 - leftHand.x/10);
+    int dx = int(leftShoulder.x/10 - leftHand.x/10)*-1;
     int dy = int(leftHand.y/10 - leftShoulder.y/10);
     return new Point(dx, dy);
   }
   
   public Point getLeftHand()
   {
-    int dx = int(rightShoulder.x/10 - rightHand.x/10);
+    int dx = int(rightShoulder.x/10 - rightHand.x/10)*-1;
     int dy = int(rightHand.y/10 - rightShoulder.y/10);
     return new Point(dx, dy);
   }
   
   public void updateStopcount()
   {
-    if (previousHeadX == head.x)
+    if (int(previousHeadX) == int(head.x))
     {
       stopcount++;
     } else {
